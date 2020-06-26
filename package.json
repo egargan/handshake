@@ -1,0 +1,17 @@
+{
+  "name": "handshake",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "cp src/index.html build/index.html; rollup --config --watch"
+  },
+  "author": "egargan",
+  "license": "ISC",
+  "dependencies": {
+    "matter-js": "^0.14.2"
+  },
+  "devDependencies": {
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-serve": "^1.0.1"
+  }
+}
