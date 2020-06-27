@@ -39,7 +39,6 @@ class Arm {
             width * 0.5,
             {
                 collisionFilter: { group: group },
-                isStatic: true,
                 render: bodyRenderOptions,
             }
         );
@@ -80,34 +79,6 @@ class Arm {
             }
         }));
 
-        // How far along the forearm these spring constraints are attached to
-        const forearmConstraintOffset = forearmLength * 0.8;
-
-        const topForearmConstraintArgs = {
-            bodyA: elbow,
-            bodyB: forearm,
-            pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
-            pointA: { x: forearmConstraintOffset, y: width * 3 },
-            stiffness: 0.005,
-            damping: 0.1,
-            render: {
-                strokeStyle: '#888'
-            }
-        };
-
-        const bottomForearmConstraintArgs = {
-            ...topForearmConstraintArgs,
-            pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
-            pointA: { x: forearmConstraintOffset, y: width * -3 },
-        };
-
-        // Add 'spring' constraints above and below forearm so it rests at
-        // a horizontal position
-        Composite.add(arm,[
-            Constraint.create(topForearmConstraintArgs),
-            Constraint.create(bottomForearmConstraintArgs)
-        ]);
-
         // Determines the height of the two constraints that attach the hand
         // to the forearm, relative to the centre of the arm
         const wristHeightOffset = forearmWidth * 0.4;
@@ -147,10 +118,75 @@ class Arm {
             Constraint.create(bottomWristConstraintArgs)
         ]);
 
+        // Translate bodies to the position coordinates passed to us
         Composite.translate(arm, Matter.Vector.create(elbowPosX, elbowPosY), true);
 
-        this.composite = arm;
+        // How far along the forearm these spring constraints are attached to
+        const forearmConstraintOffset = forearmLength * 0.8;
 
+        const topForearmConstraintArgs = {
+            bodyB: forearm,
+            pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
+            pointA: { x: elbowPosX + forearmConstraintOffset, y: elbowPosY + width * 3 },
+            stiffness: 0.005,
+            damping: 0.1,
+            render: {
+                strokeStyle: '#888'
+            }
+        };
+
+        const bottomForearmConstraintArgs = {
+            ...topForearmConstraintArgs,
+            pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
+            pointA: { x: elbowPosX + forearmConstraintOffset, y: elbowPosY + width * -3 },
+        };
+
+        // Add 'spring' constraints above and below forearm so it rests at
+        // a horizontal position
+        Composite.add(arm,[
+            Constraint.create(topForearmConstraintArgs),
+            Constraint.create(bottomForearmConstraintArgs)
+        ]);
+
+        const commonElbowConstraintArgs = {
+            bodyB: elbow,
+            pointB: { x: 0, y: 0 },
+            damping: 0.5,
+            render: {
+                strokeStyle: '#888'
+            }
+        };
+
+        const leftElbowConstraintArgs = {
+            ...commonElbowConstraintArgs,
+            pointA: { x: elbowPosX - 150, y: elbowPosY },
+            stiffness: 0.005,
+        };
+
+        const rightElbowConstraintArgs = {
+            ...leftElbowConstraintArgs,
+            pointA: { x: elbowPosX + 150, y: elbowPosY },
+        };
+
+        const topElbowConstraintArgs = {
+            ...commonElbowConstraintArgs,
+            pointA: { x: elbowPosX, y: elbowPosY - 80 },
+            stiffness: 0.15,
+        };
+
+        const bottomElbowConstraintArgs = {
+            ...topElbowConstraintArgs,
+            pointA: { x: elbowPosX, y: elbowPosY + 80 },
+        };
+
+        Composite.add(arm, [
+            Constraint.create(leftElbowConstraintArgs),
+            Constraint.create(rightElbowConstraintArgs),
+            Constraint.create(topElbowConstraintArgs),
+            Constraint.create(bottomElbowConstraintArgs)
+        ]);
+
+        this.composite = arm;
         this.elbow = elbow;
         this.forearm = forearm;
         this.hand = hand;
