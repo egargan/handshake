@@ -7,6 +7,13 @@ const Events = Matter.Events;
 let yForce = 0;
 let xOffset = 0;
 
+const mouseArea = {
+    minX: 100,
+    maxX: window.innerWidth - 100,
+    minY: 200,
+    maxY: window.innerHeight - 200,
+}
+
 // TODO: can we avoid using 'window' in this module? Ideally we only want to
 // assume 'window' exists in main.js, in case we're using this stuff
 // in a non-browser environment
@@ -21,12 +28,12 @@ function initArmController(arm, engine) {
 }
 
 function mouseListener(e) {
-    yForce = mapMouseYToHandForce(e.y, 0, window.innerHeight);
-    xOffset = mapMouseXToArmXOffset(e.x, 0, window.innerWidth);
+    yForce = mapMouseYToHandForce(e.y, mouseArea.minY, mouseArea.maxY);
+    xOffset = mapMouseXToArmXOffset(e.x, mouseArea.minX, mouseArea.maxX);
 }
 
 function mapMouseYToHandForce(mouseY, minY, maxY) {
-    const maxYForce = 0.13;
+    const maxYForce = 0.12;
 
     const halfAreaHeight = (maxY - minY) * 0.5;
     let mouseYNormalised = (halfAreaHeight - mouseY + minY) / halfAreaHeight;
