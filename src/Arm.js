@@ -198,8 +198,8 @@ class Arm {
         this.hand.force.y = force;
     }
 
-    setArmXOffset(distanceOffset) {
-        this.elbow.position.x = this.elbowRestPosX + distanceOffset;
+    setElbowXForce(force) {
+        this.elbow.force.x = force;
     }
 
     getComposite() {

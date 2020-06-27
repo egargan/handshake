@@ -5,7 +5,7 @@ export { initArmController };
 const Events = Matter.Events;
 
 let yForce = 0;
-let xOffset = 0;
+let xForce = 0;
 
 const mouseArea = {
     minX: 100,
@@ -23,13 +23,13 @@ function initArmController(arm, engine) {
 
     Events.on(engine, "beforeUpdate", () => {
         arm.setHandYForce(-yForce);
-        arm.setArmXOffset(-xOffset);
+        arm.setElbowXForce(-xForce);
     })
 }
 
 function mouseListener(e) {
     yForce = mapMouseYToHandForce(e.y, mouseArea.minY, mouseArea.maxY);
-    xOffset = mapMouseXToArmXOffset(e.x, mouseArea.minX, mouseArea.maxX);
+    xForce = mapMouseXToElbowForce(e.x, mouseArea.minX, mouseArea.maxX);
 }
 
 function mapMouseYToHandForce(mouseY, minY, maxY) {
@@ -48,8 +48,8 @@ function mapMouseYToHandForce(mouseY, minY, maxY) {
     return mouseYNormalised * maxYForce;
 }
 
-function mapMouseXToArmXOffset(mouseX, minX, maxX) {
-    const maxOffset = 70;
+function mapMouseXToElbowForce(mouseX, minX, maxX) {
+    const maxXForce = 0.2;
 
     const halfAreaWidth = (maxX - minX) * 0.5;
     let mouseXNormalised = (halfAreaWidth - mouseX + minX) / halfAreaWidth;
@@ -61,5 +61,5 @@ function mapMouseXToArmXOffset(mouseX, minX, maxX) {
         mouseXNormalised = -1;
     }
 
-    return mouseXNormalised * maxOffset;
+    return mouseXNormalised * maxXForce;
 }
