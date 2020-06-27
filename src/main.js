@@ -98,6 +98,7 @@ class Arm {
 
         const bottomForearmConstraintArgs = {
             ...topForearmConstraintArgs,
+            pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
             pointA: { x: forearmConstraintOffset, y: width * -2 },
         };
 
