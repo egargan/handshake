@@ -20,10 +20,13 @@ const render = Render.create({
     }
 });
 
-const arm = new Arm({ elbowPosX: 200, elbowPosY: 300, isPointingRight: true });
-World.add(world, arm.getComposite());
+const leftArm = new Arm({ elbowPosX: 200, elbowPosY: 300, isPointingRight: true });
+const rightArm = new Arm({ elbowPosX: 650, elbowPosY: 300, isPointingRight: false });
 
-initArmController(arm, engine)
+World.add(world, leftArm.getComposite());
+World.add(world, rightArm.getComposite());
+
+initArmController(leftArm, engine)
 
 Engine.run(engine);
 Render.run(render);
