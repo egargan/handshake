@@ -1,6 +1,7 @@
 import Matter from 'matter-js';
 
 const Engine = Matter.Engine,
+    Events = Matter.Events,
     Render = Matter.Render,
     Body = Matter.Body,
     Composite = Matter.Composite,
@@ -13,7 +14,7 @@ class Arm {
         length = 240,
         width = 60,
         posX = 200,
-        posY = 200,
+        posY = 300,
     }) {
         const group = Body.nextGroup(true);
 
@@ -88,7 +89,7 @@ class Arm {
             bodyA: elbow,
             bodyB: forearm,
             pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
-            pointA: { x: forearmConstraintOffset, y: width * 2 },
+            pointA: { x: forearmConstraintOffset, y: width * 3 },
             stiffness: 0.005,
             damping: 0.1,
             render: {
@@ -99,7 +100,7 @@ class Arm {
         const bottomForearmConstraintArgs = {
             ...topForearmConstraintArgs,
             pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
-            pointA: { x: forearmConstraintOffset, y: width * -2 },
+            pointA: { x: forearmConstraintOffset, y: width * -3 },
         };
 
         // Add 'spring' constraints above and below forearm so it rests at
@@ -149,6 +150,20 @@ class Arm {
         ]);
 
         this.composite = arm;
+
+        this.elbow = elbow;
+        this.forearm = forearm;
+        this.hand = hand;
+
+        this.restXPos = posX;
+    }
+
+    setHandYForce(force) {
+        this.hand.force.y = force;
+    }
+
+    setArmXOffset(distanceOffset) {
+        this.elbow.position.x = this.restXPos + distanceOffset;
     }
 
     getComposite() {
@@ -170,8 +185,39 @@ const render = Render.create({
     }
 });
 
-const arm = new Arm({}).getComposite();
-World.add(world, arm);
+const arm = new Arm({});
+World.add(world, arm.getComposite());
+
+function mapMouseYToHandForce(mouseY, minY, maxY) {
+    const maxYForce = 0.13;
+
+    const halfAreaHeight = (maxY - minY) * 0.5;
+    const mouseYNormalised = (halfAreaHeight - mouseY - minY) / halfAreaHeight;
+
+    return mouseYNormalised * maxYForce;
+}
+
+function mapMouseXToArmXOffset(mouseX, minX, maxX) {
+    const maxOffset = 70;
+
+    const halfAreaWidth = (maxX - minX) * 0.5;
+    const mouseXNormalised = (halfAreaWidth - mouseX - minX) / halfAreaWidth;
+
+    return mouseXNormalised * maxOffset;
+}
+
+let yForce = 0;
+let xOffset = 0;
+
+window.addEventListener('mousemove', (e) => {
+    yForce = mapMouseYToHandForce(e.y, 0, window.innerHeight);
+    xOffset = mapMouseXToArmXOffset(e.x, 0, window.innerWidth);
+}, false)
+
+Events.on(engine, "beforeUpdate", () => {
+    arm.setHandYForce(-yForce);
+    arm.setArmXOffset(-xOffset);
+})
 
 Engine.run(engine);
 Render.run(render);
