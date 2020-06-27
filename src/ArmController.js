@@ -29,7 +29,14 @@ function mapMouseYToHandForce(mouseY, minY, maxY) {
     const maxYForce = 0.13;
 
     const halfAreaHeight = (maxY - minY) * 0.5;
-    const mouseYNormalised = (halfAreaHeight - mouseY + minY) / halfAreaHeight;
+    let mouseYNormalised = (halfAreaHeight - mouseY + minY) / halfAreaHeight;
+
+    if (mouseYNormalised > 1) {
+        mouseYNormalised = 1;
+    }
+    else if (mouseYNormalised < -1) {
+        mouseYNormalised = -1;
+    }
 
     return mouseYNormalised * maxYForce;
 }
@@ -38,7 +45,14 @@ function mapMouseXToArmXOffset(mouseX, minX, maxX) {
     const maxOffset = 70;
 
     const halfAreaWidth = (maxX - minX) * 0.5;
-    const mouseXNormalised = (halfAreaWidth - mouseX + minX) / halfAreaWidth;
+    let mouseXNormalised = (halfAreaWidth - mouseX + minX) / halfAreaWidth;
+
+    if (mouseXNormalised > 1) {
+        mouseXNormalised = 1;
+    }
+    else if (mouseXNormalised < -1) {
+        mouseXNormalised = -1;
+    }
 
     return mouseXNormalised * maxOffset;
 }
