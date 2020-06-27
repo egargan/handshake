@@ -9,18 +9,18 @@ const Body = Matter.Body,
 
 class Arm {
     constructor({
-        posX,
-        posY,
+        elbowPosX,
+        elbowPosY,
         length = 240,
         width = 60,
+        isPointingRight = true,
     }) {
         const group = Body.nextGroup(true);
 
-        const forearmLength = length * 0.8;
-        const forearmWidth = width * 0.9;
-
-        const handLength = length * 0.2;
-        const handWidth = width;
+        const forearmLength = 0.8 * (isPointingRight ? length : -length);
+        const forearmWidth = 0.9 * (isPointingRight ? width : -width);
+        const handLength = 0.2 * (isPointingRight ? length : -length);
+        const handWidth = isPointingRight ? width : -width;
 
         // The length of the overlapping area between the hand and forearm
         const handForearmOverlap = handLength * 0.2;
@@ -147,7 +147,7 @@ class Arm {
             Constraint.create(bottomWristConstraintArgs)
         ]);
 
-        Composite.translate(arm, Matter.Vector.create(posX, posY), true);
+        Composite.translate(arm, Matter.Vector.create(elbowPosX, elbowPosY), true);
 
         this.composite = arm;
 
@@ -155,7 +155,7 @@ class Arm {
         this.forearm = forearm;
         this.hand = hand;
 
-        this.restXPos = posX;
+        this.elbowRestPosX = elbowPosX;
     }
 
     setHandYForce(force) {
@@ -163,7 +163,7 @@ class Arm {
     }
 
     setArmXOffset(distanceOffset) {
-        this.elbow.position.x = this.restXPos + distanceOffset;
+        this.elbow.position.x = this.elbowRestPosX + distanceOffset;
     }
 
     getComposite() {
