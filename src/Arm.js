@@ -16,7 +16,7 @@ class Arm {
     }) {
         const group = Body.nextGroup(true);
 
-        const forearmLength = length * 0.85;
+        const forearmLength = length * 0.8;
         const forearmWidth = width * 0.9;
 
         const handLength = length * 0.2;
@@ -34,8 +34,8 @@ class Arm {
 
         // Elbow is a *static* body, meaning it's essentially fixed in space
         const elbow = Bodies.circle(
-            posX,
-            posY,
+            0,
+            0,
             width * 0.5,
             {
                 collisionFilter: { group: group },
@@ -45,8 +45,8 @@ class Arm {
         );
 
         const forearm = Bodies.rectangle(
-            posX + (forearmLength * 0.5),
-            posY,
+            forearmLength * 0.5,
+            0,
             forearmLength,
             forearmWidth,
             {
@@ -56,8 +56,8 @@ class Arm {
         );
 
         const hand = Bodies.rectangle(
-            (posX + forearmLength + handLength * 0.5) - handForearmOverlap,
-            posY,
+            (forearmLength + handLength * 0.5) - handForearmOverlap,
+            0,
             handLength,
             handWidth,
             {
@@ -146,6 +146,8 @@ class Arm {
             Constraint.create(topWristConstraintArgs),
             Constraint.create(bottomWristConstraintArgs)
         ]);
+
+        Composite.translate(arm, Matter.Vector.create(posX, posY), true);
 
         this.composite = arm;
 
