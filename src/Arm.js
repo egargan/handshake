@@ -9,10 +9,10 @@ const Body = Matter.Body,
 
 class Arm {
     constructor({
+        posX,
+        posY,
         length = 240,
         width = 60,
-        posX = 200,
-        posY = 300,
     }) {
         const group = Body.nextGroup(true);
 

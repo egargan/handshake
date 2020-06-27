@@ -20,7 +20,7 @@ const render = Render.create({
     }
 });
 
-const arm = new Arm({});
+const arm = new Arm({ posX: 200, posY: 300 });
 World.add(world, arm.getComposite());
 
 initArmController(arm, engine)
