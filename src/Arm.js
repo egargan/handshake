@@ -1,4 +1,5 @@
 import Matter from 'matter-js';
+import { translateCompositeWithConstraints } from './Utils.js';
 
 export default Arm;
 
@@ -118,8 +119,6 @@ class Arm {
             Constraint.create(bottomWristConstraintArgs)
         ]);
 
-        // Translate bodies to the position coordinates passed to us
-        Composite.translate(arm, Matter.Vector.create(elbowPosX, elbowPosY), true);
 
         // How far along the forearm these spring constraints are attached to
         const forearmConstraintOffset = forearmLength * 0.8;
@@ -127,18 +126,18 @@ class Arm {
         const topForearmConstraintArgs = {
             bodyB: forearm,
             pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
-            pointA: { x: elbowPosX + forearmConstraintOffset, y: elbowPosY + width * 3 },
+            pointA: { x: forearmConstraintOffset, y: width * 3 },
             stiffness: 0.005,
             damping: 0.1,
             render: {
-                strokeStyle: '#888'
+                strokeStyle: '#ccc'
             }
         };
 
         const bottomForearmConstraintArgs = {
             ...topForearmConstraintArgs,
             pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
-            pointA: { x: elbowPosX + forearmConstraintOffset, y: elbowPosY + width * -3 },
+            pointA: { x: forearmConstraintOffset, y: width * -3 },
         };
 
         // Add 'spring' constraints above and below forearm so it rests at
@@ -153,30 +152,30 @@ class Arm {
             pointB: { x: 0, y: 0 },
             damping: 0.5,
             render: {
-                strokeStyle: '#888'
+                strokeStyle: '#ccc'
             }
         };
 
         const leftElbowConstraintArgs = {
             ...commonElbowConstraintArgs,
-            pointA: { x: elbowPosX - 150, y: elbowPosY },
+            pointA: { x: -150, y: 0 },
             stiffness: 0.005,
         };
 
         const rightElbowConstraintArgs = {
             ...leftElbowConstraintArgs,
-            pointA: { x: elbowPosX + 150, y: elbowPosY },
+            pointA: { x: 150, y: 0 },
         };
 
         const topElbowConstraintArgs = {
             ...commonElbowConstraintArgs,
-            pointA: { x: elbowPosX, y: elbowPosY - 80 },
+            pointA: { x: 0, y: -80 },
             stiffness: 0.15,
         };
 
         const bottomElbowConstraintArgs = {
             ...topElbowConstraintArgs,
-            pointA: { x: elbowPosX, y: elbowPosY + 80 },
+            pointA: { x: 0, y: 80 },
         };
 
         Composite.add(arm, [
@@ -185,6 +184,9 @@ class Arm {
             Constraint.create(topElbowConstraintArgs),
             Constraint.create(bottomElbowConstraintArgs)
         ]);
+
+        // Move all bodies and world-fixed constraints to given position coords
+        translateCompositeWithConstraints(arm, Matter.Vector.create(elbowPosX, elbowPosY));
 
         this.composite = arm;
         this.elbow = elbow;
