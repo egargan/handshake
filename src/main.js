@@ -26,7 +26,7 @@ const rightArm = new Arm({ elbowPosX: 650, elbowPosY: 300, isPointingRight: fals
 World.add(world, leftArm.getComposite());
 World.add(world, rightArm.getComposite());
 
-initArmController(leftArm, engine)
+initArmController(leftArm, engine, window);
 
 Engine.run(engine);
 Render.run(render);

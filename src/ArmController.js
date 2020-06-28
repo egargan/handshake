@@ -4,32 +4,24 @@ export { initArmController };
 
 const Events = Matter.Events;
 
-let yForce = 0;
-let xForce = 0;
+function initArmController(arm, engine, window) {
+    const mouseAreaMinX = 150;
+    const mouseAreaMaxX = window.innerWidth - mouseAreaMinX;
+    const mouseAreaMinY = 200;
+    const mouseAreaMaxY = window.innerWidth - mouseAreaMinY;
 
-const mouseArea = {
-    minX: 100,
-    maxX: window.innerWidth - 100,
-    minY: 200,
-    maxY: window.innerHeight - 200,
-}
+    let xForce = 0;
+    let yForce = 0;
 
-// TODO: can we avoid using 'window' in this module? Ideally we only want to
-// assume 'window' exists in main.js, in case we're using this stuff
-// in a non-browser environment
-
-function initArmController(arm, engine) {
-    window.addEventListener('mousemove', mouseListener, false);
+    window.addEventListener('mousemove', (event) => {
+        yForce = mapMouseYToHandForce(event.y, mouseAreaMinY, mouseAreaMaxY);
+        xForce = mapMouseXToElbowForce(event.x, mouseAreaMinX, mouseAreaMaxX);
+    }, false);
 
     Events.on(engine, "beforeUpdate", () => {
         arm.setHandYForce(-yForce);
         arm.setElbowXForce(-xForce);
     })
-}
-
-function mouseListener(e) {
-    yForce = mapMouseYToHandForce(e.y, mouseArea.minY, mouseArea.maxY);
-    xForce = mapMouseXToElbowForce(e.x, mouseArea.minX, mouseArea.maxX);
 }
 
 function mapMouseYToHandForce(mouseY, minY, maxY) {
