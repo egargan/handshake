@@ -4,11 +4,16 @@ export { initArmController };
 
 const Events = Matter.Events;
 
-function initArmController(arm, engine, window) {
-    const mouseAreaMinX = 150;
-    const mouseAreaMaxX = window.innerWidth - mouseAreaMinX;
-    const mouseAreaMinY = 200;
-    const mouseAreaMaxY = window.innerWidth - mouseAreaMinY;
+function initArmController(arm, engine, canvas, mouseAreaDimens) {
+    const canvasBoundingRect = canvas.getBoundingClientRect();
+
+    const mouseAreaWidthOffset = (canvasBoundingRect.width - mouseAreaDimens.width) * 0.5;
+    const mouseAreaHeightOffset = (canvasBoundingRect.height - mouseAreaDimens.height) * 0.5;
+
+    const mouseAreaMinX = canvasBoundingRect.left + mouseAreaWidthOffset
+    const mouseAreaMaxX = canvasBoundingRect.right - mouseAreaWidthOffset;
+    const mouseAreaMinY = canvasBoundingRect.top + mouseAreaHeightOffset;
+    const mouseAreaMaxY = canvasBoundingRect.bottom - mouseAreaHeightOffset;
 
     let xForce = 0;
     let yForce = 0;
@@ -19,25 +24,31 @@ function initArmController(arm, engine, window) {
     }, false);
 
     Events.on(engine, "beforeUpdate", () => {
-        arm.setHandYForce(-yForce);
+        arm.setHandYForce(yForce);
         arm.setElbowXForce(-xForce);
     })
 }
 
 function mapMouseYToHandForce(mouseY, minY, maxY) {
+    const halfAreaHeight = (maxY - minY) / 2;
     const maxYForce = 0.12;
 
-    const halfAreaHeight = (maxY - minY) * 0.5;
-    let mouseYNormalised = (halfAreaHeight - mouseY + minY) / halfAreaHeight;
+    let workingMouseY = mouseY;
 
-    if (mouseYNormalised > 1) {
-        mouseYNormalised = 1;
-    }
-    else if (mouseYNormalised < -1) {
-        mouseYNormalised = -1;
-    }
+    workingMouseY = Math.max(Math.min(mouseY, maxY), minY);
+    workingMouseY = workingMouseY - minY - halfAreaHeight;
+    workingMouseY = workingMouseY / halfAreaHeight;
 
-    return mouseYNormalised * maxYForce;
+    // y = rt(x) makes bumpbing difficult, not a fan
+    // const isNegative = workingMouseY < 0;
+    // workingMouseY = Math.sqrt(Math.abs(workingMouseY));
+    // workingMouseY = isNegative ? -workingMouseY : workingMouseY;
+
+    // y = x^3 works pretty well!
+    const isNegative = workingMouseY < 0;
+    workingMouseY = workingMouseY * workingMouseY * workingMouseY;
+
+    return workingMouseY * maxYForce;
 }
 
 function mapMouseXToElbowForce(mouseX, minX, maxX) {
