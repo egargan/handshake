@@ -5,22 +5,17 @@ export { initArmController };
 const Events = Matter.Events;
 
 function initArmController(arm, engine, canvas, mouseAreaDimens) {
-    const canvasBoundingRect = canvas.getBoundingClientRect();
-
-    const mouseAreaWidthOffset = (canvasBoundingRect.width - mouseAreaDimens.width) * 0.5;
-    const mouseAreaHeightOffset = (canvasBoundingRect.height - mouseAreaDimens.height) * 0.5;
-
-    const mouseAreaMinX = canvasBoundingRect.left + mouseAreaWidthOffset
-    const mouseAreaMaxX = canvasBoundingRect.right - mouseAreaWidthOffset;
-    const mouseAreaMinY = canvasBoundingRect.top + mouseAreaHeightOffset;
-    const mouseAreaMaxY = canvasBoundingRect.bottom - mouseAreaHeightOffset;
+    const mouseAreaBounds = getMouseAreaBounds(canvas, mouseAreaDimens);
 
     let xForce = 0;
     let yForce = 0;
 
     window.addEventListener('mousemove', (event) => {
-        yForce = mapMouseYToHandForce(event.y, mouseAreaMinY, mouseAreaMaxY);
-        xForce = mapMouseXToElbowForce(event.x, mouseAreaMinX, mouseAreaMaxX);
+        let unitVec = getRelativeUnitVec(event, mouseAreaBounds);
+        unitVec = limitVec(unitVec, 1);
+
+        yForce = signedPow(unitVec.y, 2) * 0.12;
+        xForce = unitVec.x * -0.2;
     }, false);
 
     Events.on(engine, "beforeUpdate", () => {
@@ -29,40 +24,63 @@ function initArmController(arm, engine, canvas, mouseAreaDimens) {
     })
 }
 
-function mapMouseYToHandForce(mouseY, minY, maxY) {
-    const halfAreaHeight = (maxY - minY) / 2;
-    const maxYForce = 0.12;
+function getMouseAreaBounds(canvas, mouseAreaDimens) {
+    const canvasBoundingRect = canvas.getBoundingClientRect();
 
-    let workingMouseY = mouseY;
+    const mouseAreaWidthOffset = (canvasBoundingRect.width - mouseAreaDimens.width) * 0.5;
+    const mouseAreaHeightOffset = (canvasBoundingRect.height - mouseAreaDimens.height) * 0.5;
 
-    workingMouseY = Math.max(Math.min(mouseY, maxY), minY);
-    workingMouseY = workingMouseY - minY - halfAreaHeight;
-    workingMouseY = workingMouseY / halfAreaHeight;
-
-    // y = rt(x) makes bumpbing difficult, not a fan
-    // const isNegative = workingMouseY < 0;
-    // workingMouseY = Math.sqrt(Math.abs(workingMouseY));
-    // workingMouseY = isNegative ? -workingMouseY : workingMouseY;
-
-    // y = x^3 works pretty well!
-    const isNegative = workingMouseY < 0;
-    workingMouseY = workingMouseY * workingMouseY * workingMouseY;
-
-    return workingMouseY * maxYForce;
+    return {
+        left: canvasBoundingRect.left + mouseAreaWidthOffset,
+        right: canvasBoundingRect.right - mouseAreaWidthOffset,
+        top: canvasBoundingRect.top + mouseAreaHeightOffset,
+        bottom: canvasBoundingRect.bottom - mouseAreaHeightOffset,
+    };
 }
 
-function mapMouseXToElbowForce(mouseX, minX, maxX) {
-    const maxXForce = 0.2;
+// Performs a Math.pow() and ensures the values sign is preserved if 'pow' is even
+function signedPow(val, pow) {
+    const needsNegating = val % 2 && val < 0;
+    return needsNegating ? -Math.pow(val, pow) : Math.pow(val, pow);
+}
 
-    const halfAreaWidth = (maxX - minX) * 0.5;
-    let mouseXNormalised = (halfAreaWidth - mouseX + minX) / halfAreaWidth;
+// Given a vector and an area on the screen described by a 'bounds' object
+// (containing 'left', 'right', 'top', 'bottom'), returns a unit vector
+// for 'vec's position inside the area, relative to its centre.
+//
+// If the given vector is outside 'area', the unit vector's absolute value
+// will be greater than 1.
+function getRelativeUnitVec(vec, area) {
+    const areaWidth = area.right - area.left;
+    const areaHeight = area.bottom - area.top;
 
-    if (mouseXNormalised > 1) {
-        mouseXNormalised = 1;
+    const areaOriginX = area.left + (areaWidth * 0.5);
+    const areaOriginY = area.top + (areaHeight * 0.5);
+
+    const vecRelativeX = vec.x - areaOriginX;
+    const vecRelativeY = vec.y - areaOriginY;
+
+    const vecRelativeXUnit = vecRelativeX / (areaWidth * 0.5);
+    const vecRelativeYUnit = vecRelativeY / (areaHeight * 0.5);
+
+    return { x: vecRelativeXUnit, y: vecRelativeYUnit };
+}
+
+// Limit the provided vector's X and/or Y component to the given maximum value
+function limitVec(vec, max) {
+    if (vec.x > max) {
+        vec.x = max
     }
-    else if (mouseXNormalised < -1) {
-        mouseXNormalised = -1;
+    else if (vec.x < -max) {
+        vec.x = -max;
     }
 
-    return mouseXNormalised * maxXForce;
+    if (vec.y > max) {
+        vec.y = max
+    }
+    else if (vec.y < -max) {
+        vec.y = -max;
+    }
+
+    return vec;
 }

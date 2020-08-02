@@ -15,6 +15,8 @@ if (containerDiv == null) {
     console.error('Document does not contain container div with id \'handshake-container\'');
 }
 
+// TODO: this can make for really thing/stocky arms which look weird and don't
+// behave consistently - need to fix the canvas' aspect ratio!
 const canvasHeight = containerDiv.getBoundingClientRect().height;
 const canvasWidth = containerDiv.getBoundingClientRect().width;
 
@@ -50,7 +52,7 @@ const rightArm = new Arm({
 // The size of the area in which the mouse can control the arm,
 // outside of which the 'maximum force' is applied in that direction
 const mouseAreaDimens = {
-    height: canvasHeight * 0.5,
+    height: canvasHeight * 0.4,
     width: canvasWidth * 0.8,
 }
 
