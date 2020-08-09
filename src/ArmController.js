@@ -4,7 +4,14 @@ export { initArmController };
 
 const Events = Matter.Events;
 
-function initArmController(arm, engine, canvas, mouseAreaDimens) {
+function initArmController({
+    arm,
+    engine,
+    canvas,
+    mouseAreaDimens,
+    yForceFormula,
+    xForceFormula,
+}) {
     const mouseAreaBounds = getMouseAreaBounds(canvas, mouseAreaDimens);
 
     let xForce = 0;
@@ -14,8 +21,8 @@ function initArmController(arm, engine, canvas, mouseAreaDimens) {
         let unitVec = getRelativeUnitVec(event, mouseAreaBounds);
         unitVec = limitVec(unitVec, 1);
 
-        yForce = signedPow(unitVec.y, 2) * 0.12;
-        xForce = unitVec.x * -0.2;
+        yForce = yForceFormula(unitVec.y);
+        xForce = xForceFormula(unitVec.x);
     }, false);
 
     Events.on(engine, "beforeUpdate", () => {
@@ -36,12 +43,6 @@ function getMouseAreaBounds(canvas, mouseAreaDimens) {
         top: canvasBoundingRect.top + mouseAreaHeightOffset,
         bottom: canvasBoundingRect.bottom - mouseAreaHeightOffset,
     };
-}
-
-// Performs a Math.pow() and ensures the values sign is preserved if 'pow' is even
-function signedPow(val, pow) {
-    const needsNegating = val % 2 && val < 0;
-    return needsNegating ? -Math.pow(val, pow) : Math.pow(val, pow);
 }
 
 // Given a vector and an area on the screen described by a 'bounds' object

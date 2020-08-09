@@ -1,6 +1,7 @@
 import Matter from 'matter-js';
 import Arm from './Arm.js';
 import { initArmController } from './ArmController.js'
+import { signedPow } from './Utils.js'
 
 const Engine = Matter.Engine,
     Render = Matter.Render,
@@ -60,7 +61,16 @@ const mouseAreaDimens = {
     width: canvasWidth * 0.8,
 }
 
-initArmController(leftArm, engine, render.canvas, mouseAreaDimens);
+initArmController({
+    arm: leftArm,
+    engine: engine,
+    canvas: render.canvas,
+    mouseAreaDimens: mouseAreaDimens,
+    // These two formulae define how much horizontal and vertical force is
+    // applied to the arm as a function of mouse position
+    yForceFormula: y => signedPow(y, 2) * 0.12,
+    xForceFormula: x => x * -0.2,
+});
 
 World.add(engine.world, leftArm.getComposite());
 World.add(engine.world, rightArm.getComposite());

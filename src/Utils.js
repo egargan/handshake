@@ -1,6 +1,6 @@
 import Matter from 'matter-js';
 
-export { translateCompositeWithConstraints };
+export { signedPow, translateCompositeWithConstraints };
 
 const Composite = Matter.Composite;
 
@@ -27,4 +27,10 @@ function translateConstraint(constraint, vector) {
         constraint.pointA.x += vector.x;
         constraint.pointA.y += vector.y;
     }
+}
+
+// Performs a Math.pow() and ensures the values sign is preserved if 'pow' is even
+function signedPow(val, pow) {
+    const needsNegating = val % 2 && val < 0;
+    return needsNegating ? -Math.pow(val, pow) : Math.pow(val, pow);
 }
