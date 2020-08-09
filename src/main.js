@@ -72,6 +72,15 @@ initArmController({
     xForceFormula: x => x * -0.2,
 });
 
+initArmController({
+    arm: rightArm,
+    engine: engine,
+    canvas: render.canvas,
+    mouseAreaDimens: mouseAreaDimens,
+    yForceFormula: y => signedPow(y, 2) * -0.04,
+    xForceFormula: x => x * 0.1,
+});
+
 World.add(engine.world, leftArm.getComposite());
 World.add(engine.world, rightArm.getComposite());
 
