@@ -32,11 +32,14 @@ const render = Render.create({
 });
 
 const armLength = canvasWidth / 3;
+const armWidth = armLength / 4;
+
 const leftArmElbowPos = canvasWidth / 6;
 const rightArmElbowPos = canvasWidth * (5 / 6);
 
 const leftArm = new Arm({
     length: armLength,
+    width: armWidth,
     elbowPosX: leftArmElbowPos,
     elbowPosY: canvasHeight * 0.5,
     isPointingRight: true,
@@ -44,6 +47,7 @@ const leftArm = new Arm({
 
 const rightArm = new Arm({
     length: armLength,
+    width: armWidth,
     elbowPosX: rightArmElbowPos,
     elbowPosY: canvasHeight * 0.5,
     isPointingRight: false,
