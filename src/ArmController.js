@@ -1,34 +1,44 @@
 import Matter from 'matter-js';
 
-export { initArmController };
+export { ArmController };
 
 const Events = Matter.Events;
 
-function initArmController({
-    arm,
-    engine,
-    canvas,
-    mouseAreaDimens,
-    yForceFormula,
-    xForceFormula,
-}) {
-    const mouseAreaBounds = getMouseAreaBounds(canvas, mouseAreaDimens);
+class ArmController {
+    constructor({
+        arm,
+        engine,
+        canvas,
+        mouseAreaDimens,
+        yForceFormula,
+        xForceFormula,
+    }) {
+        this.canvasDimensChanged(canvas, mouseAreaDimens);
 
-    let xForce = 0;
-    let yForce = 0;
+        this.xForce = 0;
+        this.yForce = 0;
 
-    window.addEventListener('mousemove', (event) => {
-        let unitVec = getRelativeUnitVec(event, mouseAreaBounds);
-        unitVec = limitVec(unitVec, 1);
+        // Destructure the 'event' given to the handler to just the information
+        // we need, the mouse's x and y position
+        window.addEventListener('mousemove', ({ x, y }) => {
+            let unitVec = getRelativeUnitVec({ x, y }, this.mouseAreaBounds);
+            unitVec = limitVec(unitVec, 1);
 
-        yForce = yForceFormula(unitVec.y);
-        xForce = xForceFormula(unitVec.x);
-    }, false);
+            this.yForce = yForceFormula(unitVec.y);
+            this.xForce = xForceFormula(unitVec.x);
+        }, false);
 
-    Events.on(engine, "beforeUpdate", () => {
-        arm.setHandYForce(yForce);
-        arm.setElbowXForce(-xForce);
-    })
+        Events.on(engine, "beforeUpdate", () => {
+            arm.setHandYForce(this.yForce);
+            arm.setElbowXForce(-this.xForce);
+        })
+    }
+
+    // Updates the controller's 'mouseAreaDimens', which makes sure mouse position
+    // is made relative to the canvas when used in the position-to-force calculations
+    canvasDimensChanged(canvas, newMouseAreaDimens) {
+        this.mouseAreaBounds = getMouseAreaBounds(canvas, newMouseAreaDimens);
+    }
 }
 
 function getMouseAreaBounds(canvas, mouseAreaDimens) {

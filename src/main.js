@@ -1,6 +1,6 @@
 import Matter from 'matter-js';
 import Arm from './Arm.js';
-import { initArmController } from './ArmController.js'
+import { ArmController } from './ArmController.js'
 import { signedPow } from './Utils.js'
 
 const Engine = Matter.Engine,
@@ -16,10 +16,10 @@ if (containerDiv == null) {
     console.error('Document does not contain container div with id \'handshake-container\'');
 }
 
-// TODO: this can make for really thing/stocky arms which look weird and don't
-// behave consistently - need to fix the canvas' aspect ratio!
-const canvasHeight = containerDiv.getBoundingClientRect().height;
-const canvasWidth = containerDiv.getBoundingClientRect().width;
+// Defining these as absolute values lets us avoid faffing around with window
+// size edge cases
+const canvasHeight = 400;
+const canvasWidth = 800;
 
 const render = Render.create({
     element: containerDiv,
@@ -32,36 +32,39 @@ const render = Render.create({
     }
 });
 
-const armLength = canvasWidth / 3;
-const armWidth = armLength / 4;
-
-const leftArmElbowPos = canvasWidth / 6;
-const rightArmElbowPos = canvasWidth * (5 / 6);
+// These values are a bit magic, but given that our canvas is a fixed size, we
+// can afford to just lay these down without worrying about what they're relative to
+const armLength = 240;
+const armWidth = 60;
+const leftArmElbowPosX = 150;
+const rightArmElbowPosX = 650;
+const leftArmElbowPosY = canvasHeight * 0.5;
+const rightArmElbowPosY = canvasHeight * 0.5;
 
 const leftArm = new Arm({
     length: armLength,
     width: armWidth,
-    elbowPosX: leftArmElbowPos,
-    elbowPosY: canvasHeight * 0.5,
+    elbowPosX: leftArmElbowPosX,
+    elbowPosY: leftArmElbowPosY,
     isPointingRight: true,
 });
 
 const rightArm = new Arm({
     length: armLength,
     width: armWidth,
-    elbowPosX: rightArmElbowPos,
-    elbowPosY: canvasHeight * 0.5,
+    elbowPosX: rightArmElbowPosX,
+    elbowPosY: rightArmElbowPosY,
     isPointingRight: false,
 });
 
 // The size of the area in which the mouse can control the arm,
 // outside of which the 'maximum force' is applied in that direction
 const mouseAreaDimens = {
-    height: canvasHeight * 0.4,
-    width: canvasWidth * 0.8,
+    height: canvasHeight * 0.6,
+    width: canvasWidth * 0.6,
 }
 
-initArmController({
+const leftArmController = new ArmController({
     arm: leftArm,
     engine: engine,
     canvas: render.canvas,
@@ -72,13 +75,22 @@ initArmController({
     xForceFormula: x => x * -0.2,
 });
 
-initArmController({
+const rightArmController = new ArmController({
     arm: rightArm,
     engine: engine,
     canvas: render.canvas,
     mouseAreaDimens: mouseAreaDimens,
     yForceFormula: y => signedPow(y, 2) * -0.04,
     xForceFormula: x => x * 0.1,
+});
+
+// We expect our canvas to be in a flex div that handles horizontally
+// and vertically centering it, so tell the arm controllers when the window
+// is resized so it can update its mouse positioning maths
+window.addEventListener('resize', () => {
+    // TODO: scale canvas if small enough?
+    leftArmController.canvasDimensChanged(render.canvas, mouseAreaDimens);
+    rightArmController.canvasDimensChanged(render.canvas, mouseAreaDimens);
 });
 
 World.add(engine.world, leftArm.getComposite());
