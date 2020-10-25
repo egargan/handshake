@@ -1,5 +1,6 @@
 import Matter from 'matter-js';
 import { translateCompositeWithConstraints } from './Utils.js';
+import Hand from './Hand.js'
 
 export default Arm;
 
@@ -16,12 +17,18 @@ class Arm {
         width = 60,
         isPointingRight = true,
     }) {
-        const group = Body.nextGroup(true);
+        const collisionGroup = Body.nextGroup(true);
+
+        const nonCollidingFilter = {
+            group: collisionGroup,
+            mask: 0,
+        }
 
         const forearmLength = 0.8 * (isPointingRight ? length : -length);
-        const forearmWidth = 0.9 * (isPointingRight ? width : -width);
+        const forearmWidth = 0.9 * width;
+
         const handLength = 0.2 * (isPointingRight ? length : -length);
-        const handWidth = isPointingRight ? width : -width;
+        const handWidth = width;
 
         // The length of the overlapping area between the hand and forearm
         const handForearmOverlap = handLength * 0.2;
@@ -34,44 +41,46 @@ class Arm {
         };
 
         // Elbow is a *static* body, meaning it's essentially fixed in space
-        const elbow = Bodies.circle(
+        const elbowBody = Bodies.circle(
             0,
             0,
             width * 0.5,
             {
-                collisionFilter: { group: group },
+                collisionFilter: nonCollidingFilter,
                 render: bodyRenderOptions,
             }
         );
 
-        const forearm = Bodies.rectangle(
+        const forearmBody = Bodies.rectangle(
             forearmLength * 0.5,
             0,
             forearmLength,
             forearmWidth,
             {
-                collisionFilter: { group: group },
+                collisionFilter: nonCollidingFilter,
                 render: bodyRenderOptions
             }
         );
 
-        const hand = Bodies.rectangle(
-            (forearmLength + handLength * 0.5) - handForearmOverlap,
-            0,
-            handLength,
-            handWidth,
-            {
-                collisionFilter: { group: group },
+        const hand = new Hand({
+            posX: (forearmLength + handLength * 0.5) - handForearmOverlap,
+            width: handWidth,
+            length: handLength,
+            isPointingRight: isPointingRight,
+            bodyOptions: {
                 render: bodyRenderOptions,
             }
-        );
+        });
 
-        Composite.add(arm, [ elbow, forearm, hand ]);
+        const handBody = hand.getMainBody();
+        const handComposite = hand.getComposite();
+
+        Composite.add(arm, [ elbowBody, forearmBody, handComposite ] );
 
         // Constrain forearm to elbow
         Composite.add(arm, Constraint.create({
-            bodyA: elbow,
-            bodyB: forearm,
+            bodyA: elbowBody,
+            bodyB: forearmBody,
             pointA: { x: 0, y: 0 },
             pointB: { x: -forearmLength * 0.5, y: 0 },
             stiffness: 0.9,
@@ -85,8 +94,8 @@ class Arm {
         const wristHeightOffset = forearmWidth * 0.4;
 
         const topWristConstraintArgs = {
-            bodyA: forearm,
-            bodyB: hand,
+            bodyA: forearmBody,
+            bodyB: handBody,
             pointA: {
                 x: (forearmLength * 0.5) - (handForearmOverlap * 0.5),
                 y: wristHeightOffset,
@@ -124,7 +133,7 @@ class Arm {
         const forearmConstraintOffset = forearmLength * 0.8;
 
         const topForearmConstraintArgs = {
-            bodyB: forearm,
+            bodyB: forearmBody,
             pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
             pointA: { x: forearmConstraintOffset, y: width * 3 },
             stiffness: 0.005,
@@ -148,7 +157,7 @@ class Arm {
         ]);
 
         const commonElbowConstraintArgs = {
-            bodyB: elbow,
+            bodyB: elbowBody,
             pointB: { x: 0, y: 0 },
             damping: 0.5,
             render: {
@@ -189,22 +198,28 @@ class Arm {
         translateCompositeWithConstraints(arm, Matter.Vector.create(elbowPosX, elbowPosY));
 
         this.composite = arm;
-        this.elbow = elbow;
-        this.forearm = forearm;
+        this.elbowBody = elbowBody;
+        this.forearmBody = forearmBody;
+
         this.hand = hand;
+        this.handBody = handBody;
 
         this.elbowRestPosX = elbowPosX;
     }
 
     setHandYForce(force) {
-        this.hand.force.y = force;
+        this.handBody.force.y = force;
     }
 
     setElbowXForce(force) {
-        this.elbow.force.x = force;
+        this.elbowBody.force.x = force;
     }
 
     getComposite() {
         return this.composite;
+    }
+
+    getHandController() {
+        return this.handController;
     }
 }
