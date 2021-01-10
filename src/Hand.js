@@ -20,8 +20,6 @@ const BOTTOM_COLLISION_MASK = TOP_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 
 // TODO:
 // * prevent fist passthrough - reduce force? increase hand density?
-// * make top + bottom contacts span 'cover' the front contact, so it's less likely
-//   two front contacts will collide when there's a 'grazing' top/bottom bump
 
 class Hand {
     constructor({
@@ -34,6 +32,10 @@ class Hand {
     }) {
         const halfLength = length * 0.5;
         const halfWidth = width * 0.5;
+
+        const contactLengthSf = 0.75;
+        const sideContactLength = length * contactLengthSf;
+        const frontContactLength = width * contactLengthSf;
         const contactWidth = 10;
 
         const contactCollisionGroup = Body.nextGroup(true);
@@ -57,7 +59,7 @@ class Hand {
         const topContact = Bodies.rectangle(
             posX,
             posY - halfWidth,
-            length,
+            sideContactLength,
             contactWidth,
             {
                 ...bodyOptions,
@@ -74,7 +76,7 @@ class Hand {
             posX + halfLength,
             posY,
             contactWidth,
-            width,
+            frontContactLength,
             {
                 ...bodyOptions,
                 label: isPointingRight ? 'leftFrontContact' : 'rightFrontContact',
@@ -89,7 +91,7 @@ class Hand {
         const bottomContact = Bodies.rectangle(
             posX,
             posY + halfWidth,
-            length,
+            sideContactLength,
             contactWidth,
             {
                 ...bodyOptions,
@@ -113,43 +115,43 @@ class Hand {
         const topContactLeftConstraintArgs = {
             ...commonConstraintArgs,
             bodyB: topContact,
-            pointA: { x: -halfLength, y: -halfWidth },
-            pointB: { x: -halfLength, y: 0 },
+            pointA: { x: -halfLength * contactLengthSf, y: -halfWidth },
+            pointB: { x: -halfLength * contactLengthSf, y: 0 },
         };
 
         const topContactRightConstraintArgs = {
             ...commonConstraintArgs,
             bodyB: topContact,
-            pointA: { x: halfLength, y: -halfWidth },
-            pointB: { x: halfLength, y: 0 },
+            pointA: { x: halfLength * contactLengthSf, y: -halfWidth },
+            pointB: { x: halfLength * contactLengthSf, y: 0 },
         };
 
         const frontContactTopConstraintArgs = {
             ...commonConstraintArgs,
             bodyB: frontContact,
-            pointA: { x: halfLength, y: -halfWidth },
-            pointB: { x: 0, y: -halfWidth },
+            pointA: { x: halfLength, y: -halfWidth * contactLengthSf },
+            pointB: { x: 0, y: -halfWidth * contactLengthSf },
         };
 
         const frontContactBottomConstraintArgs = {
             ...commonConstraintArgs,
             bodyB: frontContact,
-            pointA: { x: halfLength, y: halfWidth },
-            pointB: { x: 0, y: halfWidth },
+            pointA: { x: halfLength, y: halfWidth * contactLengthSf },
+            pointB: { x: 0, y: halfWidth * contactLengthSf },
         };
 
         const bottomContactLeftConstraintArgs = {
             ...commonConstraintArgs,
             bodyB: bottomContact,
-            pointA: { x: -halfLength, y: halfWidth },
-            pointB: { x: -halfLength, y: 0 },
+            pointA: { x: -halfLength * contactLengthSf, y: halfWidth },
+            pointB: { x: -halfLength * contactLengthSf, y: 0 },
         };
 
         const bottomContactRightConstraintArgs = {
             ...commonConstraintArgs,
             bodyB: bottomContact,
-            pointA: { x: halfLength, y: halfWidth },
-            pointB: { x: halfLength, y: 0 },
+            pointA: { x: halfLength * contactLengthSf, y: halfWidth },
+            pointB: { x: halfLength * contactLengthSf, y: 0 },
         };
 
         const handComposite = Composite.create();
