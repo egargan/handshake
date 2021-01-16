@@ -1,7 +1,9 @@
 import Matter from 'matter-js';
 import Arm from './Arm.js';
-import { ArmController } from './ArmController.js'
-import { signedPow } from './Utils.js'
+import { ArmController } from './ArmController.js';
+import { signedPow } from './Utils.js';
+import Hand from './Hand.js';
+import BumpListener, { BUMP_TYPE } from './BumpListener.js';
 
 const Engine = Matter.Engine,
     Render = Matter.Render,
@@ -98,3 +100,17 @@ World.add(engine.world, rightArm.getComposite());
 
 Engine.run(engine);
 Render.run(render);
+
+const listener = new BumpListener(engine);
+
+listener.subscribe((bumpEvent) => {
+  if (bumpEvent.type == BUMP_TYPE.TOP) {
+    console.log('top!');
+  }
+  else if (bumpEvent.type == BUMP_TYPE.FRONT) {
+    console.log('front!');
+  }
+  else if (bumpEvent.type == BUMP_TYPE.BOTTOM) {
+    console.log('bottom!');
+  }
+});

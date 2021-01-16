@@ -1,6 +1,16 @@
 import Matter from 'matter-js';
 
-export default Hand;
+export const LH_PREFIX = 'LH';
+export const LH_BODY = LH_PREFIX + '_BODY';
+export const LH_TOP_CONTACT = LH_PREFIX + '_TOP_CONTACT';
+export const LH_FRONT_CONTACT = LH_PREFIX + '_FRONT_CONTACT';
+export const LH_BOTTOM_CONTACT = LH_PREFIX + '_BOTTOM_CONTACT';
+
+export const RH_PREFIX = 'RH';
+export const RH_BODY = RH_PREFIX + '_BODY';
+export const RH_TOP_CONTACT = RH_PREFIX + '_TOP_CONTACT';
+export const RH_FRONT_CONTACT = RH_PREFIX + '_FRONT_CONTACT';
+export const RH_BOTTOM_CONTACT = RH_PREFIX + '_BOTTOM_CONTACT';
 
 const Bodies = Matter.Bodies,
     Body = Matter.Body,
@@ -21,7 +31,7 @@ const BOTTOM_COLLISION_MASK = TOP_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 // TODO:
 // * prevent fist passthrough - reduce force? increase hand density?
 
-class Hand {
+export default class Hand {
     constructor({
         posX = 0,
         posY = 0,
@@ -47,7 +57,7 @@ class Hand {
             width,
             {
                 ...bodyOptions,
-                label: isPointingRight ? 'leftHand' : 'rightHand',
+                label: isPointingRight ? LH_BODY : RH_BODY,
                 collisionFilter: {
                     category: HAND_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
@@ -63,7 +73,7 @@ class Hand {
             contactWidth,
             {
                 ...bodyOptions,
-                label: isPointingRight ? 'leftTopContact' : 'rightTopContact',
+                label: isPointingRight ? LH_TOP_CONTACT : RH_TOP_CONTACT,
                 collisionFilter: {
                     category: TOP_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
@@ -79,7 +89,7 @@ class Hand {
             frontContactLength,
             {
                 ...bodyOptions,
-                label: isPointingRight ? 'leftFrontContact' : 'rightFrontContact',
+                label: isPointingRight ? LH_FRONT_CONTACT : RH_FRONT_CONTACT,
                 collisionFilter: {
                     category: FRONT_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
@@ -95,7 +105,7 @@ class Hand {
             contactWidth,
             {
                 ...bodyOptions,
-                label: isPointingRight ? 'leftBottomContact' : 'rightBottomContact',
+                label: isPointingRight ? LH_BOTTOM_CONTACT : RH_BOTTOM_CONTACT,
                 collisionFilter: {
                     category: BOTTOM_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
