@@ -48,7 +48,7 @@ const leftArm = new Arm({
     width: armWidth,
     elbowPosX: leftArmElbowPosX,
     elbowPosY: leftArmElbowPosY,
-    isPointingRight: true,
+    isLeftHand: true,
 });
 
 const rightArm = new Arm({
@@ -56,7 +56,7 @@ const rightArm = new Arm({
     width: armWidth,
     elbowPosX: rightArmElbowPosX,
     elbowPosY: rightArmElbowPosY,
-    isPointingRight: false,
+    isLeftHand: false,
 });
 
 // The size of the area in which the mouse can control the arm,

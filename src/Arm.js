@@ -9,13 +9,24 @@ const Body = Matter.Body,
     Constraint = Matter.Constraint,
     Bodies = Matter.Bodies;
 
+// TODO: this is duplicated in Hand.js - move to common file?
+// Controls how bodies are rendered when the 'debug' argument is set.
+//
+// Should be set as the 'render' property in the options object given to Body
+// factory functions (e.g. 'Body.rectangle').
+const debugBodyRender = {
+    fillStyle: 'transparent',
+    lineWidth: 1,
+}
+
 class Arm {
     constructor({
         elbowPosX,
         elbowPosY,
         length = 240,
         width = 60,
-        isPointingRight = true,
+        isLeftHand = true,
+        debug = false,
     }) {
         const collisionGroup = Body.nextGroup(true);
 
@@ -24,10 +35,10 @@ class Arm {
             mask: 0,
         }
 
-        const forearmLength = 0.8 * (isPointingRight ? length : -length);
+        const forearmLength = 0.8 * (isLeftHand ? length : -length);
         const forearmWidth = 0.9 * width;
 
-        const handLength = 0.2 * (isPointingRight ? length : -length);
+        const handLength = 0.25 * (isLeftHand ? length : -length);
         const handWidth = width;
 
         // The length of the overlapping area between the hand and forearm
@@ -36,8 +47,8 @@ class Arm {
         const arm = Composite.create();
 
         const bodyRenderOptions = {
-            fillStyle: 'transparent',
-            lineWidth: 1,
+            ...debugBodyRender,
+            visible: debug,
         };
 
         // Elbow is a *static* body, meaning it's essentially fixed in space
@@ -58,7 +69,7 @@ class Arm {
             forearmWidth,
             {
                 collisionFilter: nonCollidingFilter,
-                render: bodyRenderOptions
+                render: getArmRenderOptions(debug, isLeftHand),
             }
         );
 
@@ -66,10 +77,8 @@ class Arm {
             posX: (forearmLength + handLength * 0.5) - handForearmOverlap,
             width: handWidth,
             length: handLength,
-            isPointingRight: isPointingRight,
-            bodyOptions: {
-                render: bodyRenderOptions,
-            }
+            isLeftHand: isLeftHand,
+            debug,
         });
 
         const handBody = hand.getMainBody();
@@ -77,16 +86,21 @@ class Arm {
 
         Composite.add(arm, [ elbowBody, forearmBody, handComposite ] );
 
+        const commonConstraintArgs = {
+            render: {
+                strokeStyle: '#aaa',
+                visible: debug,
+            },
+        }
+
         // Constrain forearm to elbow
         Composite.add(arm, Constraint.create({
+            ...commonConstraintArgs,
             bodyA: elbowBody,
             bodyB: forearmBody,
             pointA: { x: 0, y: 0 },
             pointB: { x: -forearmLength * 0.5, y: 0 },
             stiffness: 0.9,
-            render: {
-                strokeStyle: '#888'
-            }
         }));
 
         // Determines the height of the two constraints that attach the hand
@@ -94,6 +108,7 @@ class Arm {
         const wristHeightOffset = forearmWidth * 0.4;
 
         const topWristConstraintArgs = {
+            ...commonConstraintArgs,
             bodyA: forearmBody,
             bodyB: handBody,
             pointA: {
@@ -104,10 +119,7 @@ class Arm {
                 x: (-handLength * 0.5) + (handForearmOverlap * 0.5),
                 y: wristHeightOffset
             },
-            stiffness: 0.5,
-            render: {
-                strokeStyle: '#888'
-            }
+            stiffness: 0.4,
         };
 
         const bottomWristConstraintArgs = {
@@ -133,14 +145,12 @@ class Arm {
         const forearmConstraintOffset = forearmLength * 0.8;
 
         const topForearmConstraintArgs = {
+            ...commonConstraintArgs,
             bodyB: forearmBody,
             pointB: { x: forearmConstraintOffset - (forearmLength * 0.5), y: 0 },
             pointA: { x: forearmConstraintOffset, y: width * 3 },
             stiffness: 0.005,
             damping: 0.1,
-            render: {
-                strokeStyle: '#ccc'
-            }
         };
 
         const bottomForearmConstraintArgs = {
@@ -157,12 +167,10 @@ class Arm {
         ]);
 
         const commonElbowConstraintArgs = {
+            ...commonConstraintArgs,
             bodyB: elbowBody,
             pointB: { x: 0, y: 0 },
             damping: 0.5,
-            render: {
-                strokeStyle: '#ccc'
-            }
         };
 
         const leftElbowConstraintArgs = {
@@ -221,5 +229,25 @@ class Arm {
 
     getHandController() {
         return this.handController;
+    }
+}
+
+function getArmRenderOptions(debug, isLeftHand) {
+    if (debug) {
+        return {
+            ...debugBodyRender,
+        };
+    }
+    else {
+        return {
+            sprite: {
+                texture: isLeftHand ?
+                    'assets/left_arm.png' :
+                    'assets/right_arm.png',
+                xOffset: isLeftHand ? 0.07 : -0.07,
+                xScale: 0.24,
+                yScale: 0.24,
+            }
+        };
     }
 }

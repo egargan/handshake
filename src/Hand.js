@@ -28,6 +28,15 @@ const TOP_COLLISION_MASK = BOTTOM_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 const FRONT_COLLISION_MASK = FRONT_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 const BOTTOM_COLLISION_MASK = TOP_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 
+// Controls how bodies are rendered when the 'debug' argument is set.
+//
+// Should be set as the 'render' property in the options object given to Body
+// factory functions (e.g. 'Body.rectangle').
+const debugBodyRender = {
+    fillStyle: 'transparent',
+    lineWidth: 1,
+}
+
 // TODO:
 // * prevent fist passthrough - reduce force? increase hand density?
 
@@ -35,9 +44,10 @@ export default class Hand {
     constructor({
         posX = 0,
         posY = 0,
+        debug = false,
         width,
         length,
-        isPointingRight,
+        isLeftHand,
         bodyOptions,
     }) {
         const halfLength = length * 0.5;
@@ -50,6 +60,11 @@ export default class Hand {
 
         const contactCollisionGroup = Body.nextGroup(true);
 
+        const contactRenderOptions = {
+            ...debugBodyRender,
+            visible: debug,
+        };
+
         const hand = Bodies.rectangle(
             posX,
             posY,
@@ -57,12 +72,13 @@ export default class Hand {
             width,
             {
                 ...bodyOptions,
-                label: isPointingRight ? LH_BODY : RH_BODY,
+                label: isLeftHand ? LH_BODY : RH_BODY,
                 collisionFilter: {
                     category: HAND_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
                     mask: HAND_COLLISION_MASK,
-                }
+                },
+                render: getHandRenderOptions(debug, isLeftHand),
             },
         );
 
@@ -72,13 +88,13 @@ export default class Hand {
             sideContactLength,
             contactWidth,
             {
-                ...bodyOptions,
-                label: isPointingRight ? LH_TOP_CONTACT : RH_TOP_CONTACT,
+                label: isLeftHand ? LH_TOP_CONTACT : RH_TOP_CONTACT,
                 collisionFilter: {
                     category: TOP_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
                     mask: TOP_COLLISION_MASK,
-                }
+                },
+                render: contactRenderOptions,
             },
         );
 
@@ -88,13 +104,13 @@ export default class Hand {
             contactWidth,
             frontContactLength,
             {
-                ...bodyOptions,
-                label: isPointingRight ? LH_FRONT_CONTACT : RH_FRONT_CONTACT,
+                label: isLeftHand ? LH_FRONT_CONTACT : RH_FRONT_CONTACT,
                 collisionFilter: {
                     category: FRONT_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
                     mask: FRONT_COLLISION_MASK,
-                }
+                },
+                render: contactRenderOptions,
             },
         );
 
@@ -104,13 +120,13 @@ export default class Hand {
             sideContactLength,
             contactWidth,
             {
-                ...bodyOptions,
-                label: isPointingRight ? LH_BOTTOM_CONTACT : RH_BOTTOM_CONTACT,
+                label: isLeftHand ? LH_BOTTOM_CONTACT : RH_BOTTOM_CONTACT,
                 collisionFilter: {
                     category: BOTTOM_COLLISION_CATEGORY,
                     group: contactCollisionGroup,
                     mask: BOTTOM_COLLISION_MASK,
-                }
+                },
+                render: contactRenderOptions,
             },
         );
 
@@ -118,8 +134,9 @@ export default class Hand {
             bodyA: hand,
             stiffness: 0.5,
             render: {
-                strokeStyle: '#888'
-            }
+                strokeStyle: '#aaa',
+                visible: debug,
+            },
         }
 
         const topContactLeftConstraintArgs = {
@@ -167,10 +184,10 @@ export default class Hand {
         const handComposite = Composite.create();
 
         Composite.add(handComposite, [
-            hand,
             topContact,
             frontContact,
             bottomContact,
+            hand,
             Constraint.create(topContactLeftConstraintArgs),
             Constraint.create(topContactRightConstraintArgs),
             Constraint.create(frontContactTopConstraintArgs),
@@ -189,5 +206,25 @@ export default class Hand {
 
     getComposite() {
         return this.composite;
+    }
+}
+
+function getHandRenderOptions(debug, isLeftHand) {
+    if (debug) {
+        return {
+            ...debugBodyRender,
+        };
+    }
+    else {
+        return {
+            sprite: {
+                texture: isLeftHand ?
+                    'assets/left_hand.png' :
+                    'assets/right_hand.png',
+                yOffset: 0.04,
+                xScale: 0.30,
+                yScale: 0.30,
+            }
+        };
     }
 }
