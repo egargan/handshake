@@ -2,9 +2,9 @@
 
 An interactive authentication method using secret handshakes as passphrases, built with [Matter.js](https://brm.io/matter-js/).
 
-I can't remember where this idea came from, but I thought it might be a fun way of restricting certain parts of a site to only those who know the secret handshake. I've really tried to think of ways that this could be an legitimate, innovative method of authentication so I can take security Twitter by storm, but I've got nothing so far.
+I can't remember where this idea came from, but I thought it might be a fun way of restricting certain parts of a site to only those who know the secret handshake. I've really tried to think of ways that this could be a legitimate, innovative method of authentication so I can take security Twitter by storm, but I've got nothing so far.
 
-Here's a sneak peek of how it looks.
+Here's a sneak peek.
 
 ![Handshake demo](https://raw.githubusercontent.com/egargan/handshake/main/readme-demo.gif)
 
