@@ -1,6 +1,6 @@
 {
   "name": "handshake",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "exports": "src/index.js",
   "files": [
     "src/Arm.js",
