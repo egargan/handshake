@@ -6,4 +6,4 @@ if (canvas == null) {
   throw new Error('document does not contain canvas with id \'handshake-canvas\'');
 }
 
-run(canvas);
+run(canvas, 'assets');

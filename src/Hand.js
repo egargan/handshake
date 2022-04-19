@@ -49,6 +49,7 @@ export default class Hand {
         length,
         isLeftHand,
         bodyOptions,
+        assetsPath,
     }) {
         const halfLength = length * 0.5;
         const halfWidth = width * 0.5;
@@ -78,7 +79,7 @@ export default class Hand {
                     group: contactCollisionGroup,
                     mask: HAND_COLLISION_MASK,
                 },
-                render: getHandRenderOptions(debug, isLeftHand),
+                render: getHandRenderOptions(debug, isLeftHand, assetsPath),
             },
         );
 
@@ -209,7 +210,7 @@ export default class Hand {
     }
 }
 
-function getHandRenderOptions(debug, isLeftHand) {
+function getHandRenderOptions(debug, isLeftHand, assetsPath) {
     if (debug) {
         return {
             ...debugBodyRender,
@@ -219,8 +220,8 @@ function getHandRenderOptions(debug, isLeftHand) {
         return {
             sprite: {
                 texture: isLeftHand ?
-                    'assets/left_hand.png' :
-                    'assets/right_hand.png',
+                    `${assetsPath}/left_hand.png` :
+                    `${assetsPath}/right_hand.png`,
                 yOffset: 0.04,
                 xScale: 0.30,
                 yScale: 0.30,

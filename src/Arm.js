@@ -25,6 +25,7 @@ export default class Arm {
         width = 60,
         isLeftHand = true,
         debug = false,
+        assetsPath,
     }) {
         const collisionGroup = Body.nextGroup(true);
 
@@ -67,7 +68,7 @@ export default class Arm {
             forearmWidth,
             {
                 collisionFilter: nonCollidingFilter,
-                render: getArmRenderOptions(debug, isLeftHand),
+                render: getArmRenderOptions(debug, isLeftHand, assetsPath),
             }
         );
 
@@ -77,6 +78,7 @@ export default class Arm {
             length: handLength,
             isLeftHand: isLeftHand,
             debug,
+            assetsPath,
         });
 
         const handBody = hand.getMainBody();
@@ -230,7 +232,7 @@ export default class Arm {
     }
 }
 
-function getArmRenderOptions(debug, isLeftHand) {
+function getArmRenderOptions(debug, isLeftHand, assetsPath) {
     if (debug) {
         return {
             ...debugBodyRender,
@@ -240,8 +242,8 @@ function getArmRenderOptions(debug, isLeftHand) {
         return {
             sprite: {
                 texture: isLeftHand ?
-                    'assets/left_arm.png' :
-                    'assets/right_arm.png',
+                    `${assetsPath}/left_arm.png` :
+                    `${assetsPath}/right_arm.png`,
                 xOffset: isLeftHand ? 0.07 : -0.07,
                 xScale: 0.24,
                 yScale: 0.24,

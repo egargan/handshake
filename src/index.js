@@ -10,7 +10,7 @@ const Engine = Matter.Engine,
   Render = Matter.Render,
   World = Matter.World;
 
-export default function run(canvas) {
+export default function run(canvas, assetsPath) {
   const engine = Engine.create();
   engine.world.gravity.y = 0;
 
@@ -46,6 +46,7 @@ export default function run(canvas) {
     elbowPosX: leftArmElbowPosX,
     elbowPosY: leftArmElbowPosY,
     isLeftHand: true,
+    assetsPath,
   });
 
   const rightArm = new Arm({
@@ -54,6 +55,7 @@ export default function run(canvas) {
     elbowPosX: rightArmElbowPosX,
     elbowPosY: rightArmElbowPosY,
     isLeftHand: false,
+    assetsPath,
   });
 
   // The size of the area in which the mouse can control the arm,
