@@ -1,9 +1,9 @@
 import run from '../index.js';
 
-const containerDiv = document.getElementById('handshake-container');
+const canvas = document.getElementById('handshake-canvas');
 
-if (containerDiv == null) {
-  throw new Error('document does not contain container div with id \'handshake-container\'');
+if (canvas == null) {
+  throw new Error('document does not contain canvas with id \'handshake-canvas\'');
 }
 
-run(containerDiv);
+run(canvas);

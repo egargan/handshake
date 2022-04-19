@@ -1,6 +1,6 @@
 import Matter from 'matter-js';
 import Arm from './Arm.js';
-import ArmController from './ArmController.js';
+import ArmController  from './ArmController.js';
 import { signedPow } from './Utils.js';
 import Hand from './Hand.js';
 import BumpListener, { BUMP_TYPE } from './BumpListener.js';
@@ -10,7 +10,7 @@ const Engine = Matter.Engine,
   Render = Matter.Render,
   World = Matter.World;
 
-export default function run(container) {
+export default function run(canvas) {
   const engine = Engine.create();
   engine.world.gravity.y = 0;
 
@@ -18,10 +18,10 @@ export default function run(container) {
   // size edge cases
   // TODO: take these from container
   const canvasHeight = 400;
-  const canvasWidth = 800;
+  const canvasWidth = 600;
 
   const render = Render.create({
-    element: container,
+    canvas,
     engine: engine,
     options: {
       wireframes: false,
@@ -35,8 +35,8 @@ export default function run(container) {
   // can afford to just lay these down without worrying about what they're relative to
   const armLength = 240;
   const armWidth = 60;
-  const leftArmElbowPosX = 150;
-  const rightArmElbowPosX = 650;
+  const leftArmElbowPosX = 50;
+  const rightArmElbowPosX = 550;
   const leftArmElbowPosY = canvasHeight * 0.5;
   const rightArmElbowPosY = canvasHeight * 0.5;
 
