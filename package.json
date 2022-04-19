@@ -12,6 +12,7 @@
     "src/index.js",
     "assets"
   ],
+  "type": "module",
   "scripts": {
     "dev": "rollup --config rollup.config.demo.js --watch"
   },
