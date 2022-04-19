@@ -1,6 +1,6 @@
 import Matter from 'matter-js';
 import Arm from './Arm.js';
-import { ArmController } from './ArmController.js';
+import ArmController from './ArmController.js';
 import { signedPow } from './Utils.js';
 import Hand from './Hand.js';
 import BumpListener, { BUMP_TYPE } from './BumpListener.js';

@@ -1,10 +1,8 @@
 import Matter from 'matter-js';
 
-export { ArmController };
-
 const Events = Matter.Events;
 
-class ArmController {
+export default class ArmController {
     constructor({
         arm,
         engine,

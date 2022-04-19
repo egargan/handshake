@@ -1,11 +1,9 @@
 import Matter from 'matter-js';
 
-export { signedPow, translateCompositeWithConstraints };
-
 const Composite = Matter.Composite;
 
 // Translates a composite's bodies and any world-space constraint coordinates
-function translateCompositeWithConstraints(composite, vector) {
+export function translateCompositeWithConstraints(composite, vector) {
     Composite.translate(composite, vector, true);
 
     for (const constraint of composite.constraints) {
@@ -17,7 +15,7 @@ function translateCompositeWithConstraints(composite, vector) {
 //
 // Constraints fixed to Bodies are not translated, as those coordinates
 // are relative to the Body
-function translateConstraint(constraint, vector) {
+export function translateConstraint(constraint, vector) {
     if (!constraint.bodyB) {
         constraint.pointB.x += vector.x;
         constraint.pointB.y += vector.y;
@@ -30,7 +28,7 @@ function translateConstraint(constraint, vector) {
 }
 
 // Performs a Math.pow() and ensures the values sign is preserved if 'pow' is even
-function signedPow(val, pow) {
+export function signedPow(val, pow) {
     const needsNegating = val % 2 && val < 0;
     return needsNegating ? -Math.pow(val, pow) : Math.pow(val, pow);
 }

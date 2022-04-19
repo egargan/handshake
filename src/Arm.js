@@ -2,8 +2,6 @@ import Matter from 'matter-js';
 import { translateCompositeWithConstraints } from './Utils.js';
 import Hand from './Hand.js'
 
-export default Arm;
-
 const Body = Matter.Body,
     Composite = Matter.Composite,
     Constraint = Matter.Constraint,
@@ -19,7 +17,7 @@ const debugBodyRender = {
     lineWidth: 1,
 }
 
-class Arm {
+export default class Arm {
     constructor({
         elbowPosX,
         elbowPosY,
