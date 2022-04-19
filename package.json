@@ -1,16 +1,27 @@
 {
   "name": "handshake",
   "version": "1.0.0",
+  "exports": "src/index.js",
+  "files": [
+    "src/Arm.js",
+    "src/Arm.js",
+    "src/ArmController.js",
+    "src/BumpListener.js",
+    "src/Hand.js",
+    "src/Utils.js",
+    "src/index.js",
+    "assets"
+  ],
   "scripts": {
-    "dev": "cp src/index.html build/index.html; rollup --config --watch"
+    "dev": "rollup --config rollup.config.demo.js --watch"
   },
   "author": "egargan",
   "license": "ISC",
   "dependencies": {
-    "matter-js": "^0.14.2",
-    "rollup-plugin-copy": "^3.4.0"
+    "matter-js": "^0.14.2"
   },
   "devDependencies": {
+    "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-serve": "^1.0.1"

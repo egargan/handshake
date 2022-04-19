@@ -6,7 +6,7 @@ import copy from 'rollup-plugin-copy'
 const BUILDDIR = 'build'
 
 export default {
-    input: 'src/main.js',
+    input: 'src/demo/index.js',
     output: {
         file: `${BUILDDIR}/bundle.js`,
         format: 'iife',
@@ -21,7 +21,7 @@ export default {
         }),
         copy({
           targets: [
-            { src: 'src/index.html', dest: BUILDDIR },
+            { src: 'src/demo/index.html', dest: BUILDDIR },
             { src: 'assets', dest: BUILDDIR },
           ],
         }),
