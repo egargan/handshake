@@ -11,35 +11,54 @@ export default class ArmController {
     yForceFormula,
     xForceFormula,
   }) {
-    this.xForce = 0;
+    this.arm = arm;
+    this.engine = engine;
+
+    // Set initial force to push hands away from each other
+    this.xForce = xForceFormula(-1);
     this.yForce = 0;
+
+    // Apply initial forces
+    this.applyArmForces();
+
+    this.xForceFormula = xForceFormula;
+    this.yForceFormula = yForceFormula;
+
+    this._boundUpdateArmForces = this.updateArmForces.bind(this);
+    this._boundApplyArmForces = this.applyArmForces.bind(this);
 
     // Initialise controller when mouse enters the canvas, avoids hands jolting towards the mouse
     // when the page loads
     canvas.addEventListener('mouseenter', () => {
       this.canvasDimensChanged(canvas, mouseAreaDimens);
-
-      // Destructure the 'event' given to the handler to just the information
-      // we need, the mouse's x and y position
-      window.addEventListener('mousemove', ({ x, y }) => {
-        let unitVec = getRelativeUnitVec({ x, y }, this.mouseAreaBounds);
-        unitVec = limitVec(unitVec, 1);
-
-        this.yForce = yForceFormula(unitVec.y);
-        this.xForce = xForceFormula(unitVec.x);
-      }, false);
-
-      Events.on(engine, "beforeUpdate", () => {
-        arm.setHandYForce(this.yForce);
-        arm.setElbowXForce(-this.xForce);
-      })
+      window.addEventListener('mousemove', this._boundUpdateArmForces, false);
     });
+
+    Events.on(this.engine, 'beforeUpdate', this._boundApplyArmForces)
+  }
+
+  updateArmForces({ x, y }) {
+    let unitVec = getRelativeUnitVec({ x, y }, this.mouseAreaBounds);
+    unitVec = limitVec(unitVec, 1);
+
+    this.yForce = this.yForceFormula(unitVec.y);
+    this.xForce = this.xForceFormula(unitVec.x);
+  }
+
+  applyArmForces() {
+    this.arm.setHandYForce(this.yForce);
+    this.arm.setElbowXForce(-this.xForce);
   }
 
   // Updates the controller's 'mouseAreaDimens', which makes sure mouse position
   // is made relative to the canvas when used in the position-to-force calculations
   canvasDimensChanged(canvas, newMouseAreaDimens) {
     this.mouseAreaBounds = getMouseAreaBounds(canvas, newMouseAreaDimens);
+  }
+
+  destroy() {
+    window.removeEventListener('mousemove', this._boundUpdateArmForces, false);
+    Events.off(this.engine, 'beforeUpdate', this._boundApplyArmForces)
   }
 }
 

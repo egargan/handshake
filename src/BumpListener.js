@@ -9,7 +9,6 @@ const Events = Matter.Events;
 
 const TOP_BOTTOM_VEL_THRESHOLD = 1;
 const FRONT_VEL_THRESHOLD = 3;
-
 const DEBOUNCE_TIME = 200;
 
 export const BUMP_TYPE = {
@@ -21,6 +20,7 @@ export const BUMP_TYPE = {
 export default class BumpListener {
   constructor(engine) {
     this.subscriptions = [];
+    this.engine = engine;
     this.ignoreEvent = false;
 
     Events.on(engine, 'collisionStart', (event) => {
@@ -65,6 +65,11 @@ export default class BumpListener {
 
   subscribe(callback) {
     this.subscriptions.push(callback);
+  }
+
+  destroy() {
+    // TODO: have this remove just the above callback
+    Events.off(this.engine, 'collisionStart');
   }
 }
 

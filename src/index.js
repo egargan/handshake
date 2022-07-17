@@ -88,11 +88,12 @@ export default function run(canvas, assetsPath) {
   // We expect our canvas to be in a flex div that handles horizontally
   // and vertically centering it, so tell the arm controllers when the window
   // is resized so it can update its mouse positioning maths
-  window.addEventListener('resize', () => {
+  const resizeListener = () => {
     // TODO: scale canvas if small enough?
     leftArmController.canvasDimensChanged(render.canvas, mouseAreaDimens);
     rightArmController.canvasDimensChanged(render.canvas, mouseAreaDimens);
-  });
+  };
+  window.addEventListener('resize', resizeListener);
 
   World.add(engine.world, leftArm.getComposite());
   World.add(engine.world, rightArm.getComposite());
@@ -100,9 +101,9 @@ export default function run(canvas, assetsPath) {
   Engine.run(engine);
   Render.run(render);
 
-  const listener = new BumpListener(engine);
+  const bumpListener = new BumpListener(engine);
 
-  listener.subscribe((bumpEvent) => {
+  bumpListener.subscribe((bumpEvent) => {
     if (bumpEvent.type == BUMP_TYPE.TOP) {
       console.log('top!');
     }
@@ -113,4 +114,17 @@ export default function run(canvas, assetsPath) {
       console.log('bottom!');
     }
   });
+
+  return () => {
+    window.removeEventListener('resize', resizeListener);
+
+    bumpListener.destroy();
+    leftArmController.destroy();
+    rightArmController.destroy();
+
+    Render.stop(render);
+    World.clear(engine.world, leftArm.getComposite());
+    World.clear(engine.world, rightArm.getComposite());
+    Engine.clear(engine);
+  }
 }
