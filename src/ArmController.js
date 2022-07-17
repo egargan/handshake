@@ -11,25 +11,29 @@ export default class ArmController {
     yForceFormula,
     xForceFormula,
   }) {
-    this.canvasDimensChanged(canvas, mouseAreaDimens);
-
     this.xForce = 0;
     this.yForce = 0;
 
-    // Destructure the 'event' given to the handler to just the information
-    // we need, the mouse's x and y position
-    window.addEventListener('mousemove', ({ x, y }) => {
-      let unitVec = getRelativeUnitVec({ x, y }, this.mouseAreaBounds);
-      unitVec = limitVec(unitVec, 1);
+    // Initialise controller when mouse enters the canvas, avoids hands jolting towards the mouse
+    // when the page loads
+    canvas.addEventListener('mouseenter', () => {
+      this.canvasDimensChanged(canvas, mouseAreaDimens);
 
-      this.yForce = yForceFormula(unitVec.y);
-      this.xForce = xForceFormula(unitVec.x);
-    }, false);
+      // Destructure the 'event' given to the handler to just the information
+      // we need, the mouse's x and y position
+      window.addEventListener('mousemove', ({ x, y }) => {
+        let unitVec = getRelativeUnitVec({ x, y }, this.mouseAreaBounds);
+        unitVec = limitVec(unitVec, 1);
 
-    Events.on(engine, "beforeUpdate", () => {
-      arm.setHandYForce(this.yForce);
-      arm.setElbowXForce(-this.xForce);
-    })
+        this.yForce = yForceFormula(unitVec.y);
+        this.xForce = xForceFormula(unitVec.x);
+      }, false);
+
+      Events.on(engine, "beforeUpdate", () => {
+        arm.setHandYForce(this.yForce);
+        arm.setElbowXForce(-this.xForce);
+      })
+    });
   }
 
   // Updates the controller's 'mouseAreaDimens', which makes sure mouse position
