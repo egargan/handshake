@@ -1,11 +1,11 @@
 import run from "../index.js";
 
-const canvas = document.getElementById("handshake-canvas");
+const container = document.querySelector("[data-handshake-container]");
 
-if (canvas == null) {
+if (!container) {
   throw new Error(
-    "document does not contain canvas with id 'handshake-canvas'"
+    "document does not contain element with 'data-handshake-container' attribute"
   );
 }
 
-run(canvas, "assets");
+run(container, "assets");

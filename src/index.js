@@ -4,12 +4,16 @@ import ArmController from "./ArmController.js";
 import { signedPow } from "./Utils.js";
 import BumpListener, { BUMP_TYPE } from "./BumpListener.js";
 
-// TODO: can't we just destructure these?
-const Engine = Matter.Engine,
-  Render = Matter.Render,
-  World = Matter.World;
+const { Engine, Render, World } = Matter;
 
-export default function run(canvas, assetsPath) {
+/**
+ * @param {HTMLElement} container
+ * @param {string} assetsPath
+ */
+export default function run(container, assetsPath) {
+  const canvas = document.createElement("canvas");
+  container.appendChild(canvas);
+
   const engine = Engine.create();
   engine.world.gravity.y = 0;
 
@@ -99,6 +103,11 @@ export default function run(canvas, assetsPath) {
 
   Engine.run(engine);
   Render.run(render);
+
+  // TODO: use this to cap framerate?
+  // Events.on(runner, 'tick',() => {
+  //   runner.deltaMin = runner.fps > 60 ? 1000 / runner.fps : 1000 / 60;
+  // })
 
   const bumpListener = new BumpListener(engine);
 

@@ -12,6 +12,9 @@ export default {
         format: 'iife',
         sourcemap: true
     },
+    watch: {
+        include: 'src/**',
+    },
     plugins: [
         commonJS(),
         resolve({
