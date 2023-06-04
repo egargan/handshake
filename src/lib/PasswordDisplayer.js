@@ -27,8 +27,8 @@ export default class PasswordDisplayer {
 
     for (let token of password) {
       const tokenImage = document.createElement("img");
-      tokenImage.style.width = "28px";
-      tokenImage.style.height = "28px";
+      tokenImage.style.width = "30px";
+      tokenImage.style.height = "30px";
 
       if (token === "TOP") {
         tokenImage.src = `${this.assetsPath}/arrow_down.svg`;
@@ -52,7 +52,7 @@ export default class PasswordDisplayer {
     container.style.display = "flex";
     // This assumes the container has relative or absolute positioning!
     container.style.position = "absolute";
-    container.style.bottom = "0";
+    container.style.bottom = "48px";
     container.style.width = "100%";
     container.style.minHeight = "20px";
     container.style.flexWrap = "wrap";

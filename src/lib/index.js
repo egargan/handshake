@@ -12,10 +12,11 @@ const { Engine, Render, World } = Matter;
 /**
  * @param {HTMLElement} container
  * @param {string} assetsPath
+ * @param {boolean} debug
  * @returns {[typeof HandshakeController, () => {}]} a tuple containing the controller used to
  * interact with the handshake system, and a cleanup function
  */
-export default function run(container, assetsPath) {
+export default function run(container, assetsPath, debug = false) {
   const canvas = document.createElement("canvas");
   container.appendChild(canvas);
 
@@ -36,6 +37,7 @@ export default function run(container, assetsPath) {
       background: "#fff",
       height: canvasHeight,
       width: canvasWidth,
+      showCollisions: debug,
     },
   });
 
@@ -55,6 +57,7 @@ export default function run(container, assetsPath) {
     elbowPosY: leftArmElbowPosY,
     isLeftHand: true,
     assetsPath,
+    debug,
   });
 
   const rightArm = new Arm({
@@ -64,6 +67,7 @@ export default function run(container, assetsPath) {
     elbowPosY: rightArmElbowPosY,
     isLeftHand: false,
     assetsPath,
+    debug,
   });
 
   // The size of the area in which the mouse can control the arm,
