@@ -1,16 +1,16 @@
-import Matter from 'matter-js';
+import Matter from "matter-js";
 
-export const LH_PREFIX = 'LH';
-export const LH_BODY = LH_PREFIX + '_BODY';
-export const LH_TOP_CONTACT = LH_PREFIX + '_TOP_CONTACT';
-export const LH_FRONT_CONTACT = LH_PREFIX + '_FRONT_CONTACT';
-export const LH_BOTTOM_CONTACT = LH_PREFIX + '_BOTTOM_CONTACT';
+export const LH_PREFIX = "LH";
+export const LH_BODY = LH_PREFIX + "_BODY";
+export const LH_TOP_CONTACT = LH_PREFIX + "_TOP_CONTACT";
+export const LH_FRONT_CONTACT = LH_PREFIX + "_FRONT_CONTACT";
+export const LH_BOTTOM_CONTACT = LH_PREFIX + "_BOTTOM_CONTACT";
 
-export const RH_PREFIX = 'RH';
-export const RH_BODY = RH_PREFIX + '_BODY';
-export const RH_TOP_CONTACT = RH_PREFIX + '_TOP_CONTACT';
-export const RH_FRONT_CONTACT = RH_PREFIX + '_FRONT_CONTACT';
-export const RH_BOTTOM_CONTACT = RH_PREFIX + '_BOTTOM_CONTACT';
+export const RH_PREFIX = "RH";
+export const RH_BODY = RH_PREFIX + "_BODY";
+export const RH_TOP_CONTACT = RH_PREFIX + "_TOP_CONTACT";
+export const RH_FRONT_CONTACT = RH_PREFIX + "_FRONT_CONTACT";
+export const RH_BOTTOM_CONTACT = RH_PREFIX + "_BOTTOM_CONTACT";
 
 const Bodies = Matter.Bodies,
   Body = Matter.Body,
@@ -22,8 +22,11 @@ const TOP_COLLISION_CATEGORY = Body.nextCategory();
 const FRONT_COLLISION_CATEGORY = Body.nextCategory();
 const BOTTOM_COLLISION_CATEGORY = Body.nextCategory();
 
-const HAND_COLLISION_MASK = TOP_COLLISION_CATEGORY | FRONT_COLLISION_CATEGORY
-  | BOTTOM_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
+const HAND_COLLISION_MASK =
+  TOP_COLLISION_CATEGORY |
+  FRONT_COLLISION_CATEGORY |
+  BOTTOM_COLLISION_CATEGORY |
+  HAND_COLLISION_CATEGORY;
 const TOP_COLLISION_MASK = BOTTOM_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 const FRONT_COLLISION_MASK = FRONT_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 const BOTTOM_COLLISION_MASK = TOP_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
@@ -33,9 +36,9 @@ const BOTTOM_COLLISION_MASK = TOP_COLLISION_CATEGORY | HAND_COLLISION_CATEGORY;
 // Should be set as the 'render' property in the options object given to Body
 // factory functions (e.g. 'Body.rectangle').
 const debugBodyRender = {
-  fillStyle: 'transparent',
+  fillStyle: "transparent",
   lineWidth: 1,
-}
+};
 
 // TODO:
 // * prevent fist passthrough - reduce force? increase hand density?
@@ -66,22 +69,16 @@ export default class Hand {
       visible: debug,
     };
 
-    const hand = Bodies.rectangle(
-      posX,
-      posY,
-      length,
-      width,
-      {
-        ...bodyOptions,
-        label: isLeftHand ? LH_BODY : RH_BODY,
-        collisionFilter: {
-          category: HAND_COLLISION_CATEGORY,
-          group: contactCollisionGroup,
-          mask: HAND_COLLISION_MASK,
-        },
-        render: getHandRenderOptions(debug, isLeftHand, assetsPath),
+    const hand = Bodies.rectangle(posX, posY, length, width, {
+      ...bodyOptions,
+      label: isLeftHand ? LH_BODY : RH_BODY,
+      collisionFilter: {
+        category: HAND_COLLISION_CATEGORY,
+        group: contactCollisionGroup,
+        mask: HAND_COLLISION_MASK,
       },
-    );
+      render: getHandRenderOptions(debug, isLeftHand, assetsPath),
+    });
 
     const topContact = Bodies.rectangle(
       posX,
@@ -96,7 +93,7 @@ export default class Hand {
           mask: TOP_COLLISION_MASK,
         },
         render: contactRenderOptions,
-      },
+      }
     );
 
     const frontContact = Bodies.rectangle(
@@ -112,7 +109,7 @@ export default class Hand {
           mask: FRONT_COLLISION_MASK,
         },
         render: contactRenderOptions,
-      },
+      }
     );
 
     const bottomContact = Bodies.rectangle(
@@ -128,17 +125,17 @@ export default class Hand {
           mask: BOTTOM_COLLISION_MASK,
         },
         render: contactRenderOptions,
-      },
+      }
     );
 
     const commonConstraintArgs = {
       bodyA: hand,
       stiffness: 0.5,
       render: {
-        strokeStyle: '#aaa',
+        strokeStyle: "#aaa",
         visible: debug,
       },
-    }
+    };
 
     const topContactLeftConstraintArgs = {
       ...commonConstraintArgs,
@@ -215,17 +212,16 @@ function getHandRenderOptions(debug, isLeftHand, assetsPath) {
     return {
       ...debugBodyRender,
     };
-  }
-  else {
+  } else {
     return {
       sprite: {
-        texture: isLeftHand ?
-        `${assetsPath}/left_hand.png` :
-        `${assetsPath}/right_hand.png`,
+        texture: isLeftHand
+          ? `${assetsPath}/left_hand.png`
+          : `${assetsPath}/right_hand.png`,
         yOffset: 0.04,
-        xScale: 0.30,
-        yScale: 0.30,
-      }
+        xScale: 0.3,
+        yScale: 0.3,
+      },
     };
   }
 }

@@ -1,9 +1,15 @@
-import Matter from 'matter-js';
+import Matter from "matter-js";
 
 import {
-  LH_PREFIX, LH_TOP_CONTACT, LH_FRONT_CONTACT, LH_BOTTOM_CONTACT,
-  RH_PREFIX, RH_TOP_CONTACT, RH_FRONT_CONTACT, RH_BOTTOM_CONTACT,
-} from './Hand.js'
+  LH_PREFIX,
+  LH_TOP_CONTACT,
+  LH_FRONT_CONTACT,
+  LH_BOTTOM_CONTACT,
+  RH_PREFIX,
+  RH_TOP_CONTACT,
+  RH_FRONT_CONTACT,
+  RH_BOTTOM_CONTACT,
+} from "./Hand.js";
 
 const Events = Matter.Events;
 
@@ -12,9 +18,9 @@ const FRONT_VEL_THRESHOLD = 3;
 const DEBOUNCE_TIME = 200;
 
 export const BUMP_TYPE = {
-  TOP: 'TOP',
-  BOTTOM: 'BOTTOM',
-  FRONT: 'FRONT',
+  TOP: "TOP",
+  BOTTOM: "BOTTOM",
+  FRONT: "FRONT",
 };
 
 export default class BumpListener {
@@ -23,7 +29,7 @@ export default class BumpListener {
     this.engine = engine;
     this.ignoreEvent = false;
 
-    Events.on(engine, 'collisionStart', (event) => {
+    Events.on(engine, "collisionStart", (event) => {
       if (this.ignoreEvent) {
         return;
       }
@@ -33,15 +39,19 @@ export default class BumpListener {
 
       let leftBody, rightBody;
 
-      if (bodyA.label.startsWith(LH_PREFIX) && bodyB.label.startsWith(RH_PREFIX)) {
+      if (
+        bodyA.label.startsWith(LH_PREFIX) &&
+        bodyB.label.startsWith(RH_PREFIX)
+      ) {
         leftBody = bodyA;
         rightBody = bodyB;
-      }
-      else if (bodyA.label.startsWith(RH_PREFIX) && bodyB.label.startsWith(LH_PREFIX)) {
+      } else if (
+        bodyA.label.startsWith(RH_PREFIX) &&
+        bodyB.label.startsWith(LH_PREFIX)
+      ) {
         leftBody = bodyB;
         rightBody = bodyA;
-      }
-      else {
+      } else {
         return;
       }
 
@@ -49,14 +59,14 @@ export default class BumpListener {
 
       if (bump) {
         for (let callback of this.subscriptions) {
-          callback( {type: bump} );
+          callback({ type: bump });
         }
 
         this.ignoreEvent = true;
 
         clearTimeout(this.debounceTimeout);
         this.debounceTimeout = setTimeout(
-          () => this.ignoreEvent = false,
+          () => (this.ignoreEvent = false),
           DEBOUNCE_TIME
         );
       }
@@ -69,22 +79,31 @@ export default class BumpListener {
 
   destroy() {
     // TODO: have this remove just the above callback
-    Events.off(this.engine, 'collisionStart');
+    Events.off(this.engine, "collisionStart");
   }
 }
 
 function detectBump(leftBody, rightBody) {
-  if (leftBody.label == LH_TOP_CONTACT && rightBody.label == RH_BOTTOM_CONTACT) {
+  if (
+    leftBody.label == LH_TOP_CONTACT &&
+    rightBody.label == RH_BOTTOM_CONTACT
+  ) {
     if (leftBody.velocity.y < -TOP_BOTTOM_VEL_THRESHOLD) {
       return BUMP_TYPE.BOTTOM;
     }
   }
-  if (leftBody.label == LH_BOTTOM_CONTACT && rightBody.label == RH_TOP_CONTACT) {
+  if (
+    leftBody.label == LH_BOTTOM_CONTACT &&
+    rightBody.label == RH_TOP_CONTACT
+  ) {
     if (leftBody.velocity.y > TOP_BOTTOM_VEL_THRESHOLD) {
       return BUMP_TYPE.TOP;
     }
   }
-  if (leftBody.label == LH_FRONT_CONTACT && rightBody.label == RH_FRONT_CONTACT) {
+  if (
+    leftBody.label == LH_FRONT_CONTACT &&
+    rightBody.label == RH_FRONT_CONTACT
+  ) {
     if (leftBody.velocity.x > FRONT_VEL_THRESHOLD) {
       return BUMP_TYPE.FRONT;
     }

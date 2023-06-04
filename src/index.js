@@ -1,9 +1,8 @@
-import Matter from 'matter-js';
-import Arm from './Arm.js';
-import ArmController  from './ArmController.js';
-import { signedPow } from './Utils.js';
-import Hand from './Hand.js';
-import BumpListener, { BUMP_TYPE } from './BumpListener.js';
+import Matter from "matter-js";
+import Arm from "./Arm.js";
+import ArmController from "./ArmController.js";
+import { signedPow } from "./Utils.js";
+import BumpListener, { BUMP_TYPE } from "./BumpListener.js";
 
 // TODO: can't we just destructure these?
 const Engine = Matter.Engine,
@@ -25,10 +24,10 @@ export default function run(canvas, assetsPath) {
     engine: engine,
     options: {
       wireframes: false,
-      background: '#fff',
+      background: "#fff",
       height: canvasHeight,
       width: canvasWidth,
-    }
+    },
   });
 
   // These values are a bit magic, but given that our canvas is a fixed size, we
@@ -63,7 +62,7 @@ export default function run(canvas, assetsPath) {
   const mouseAreaDimens = {
     height: canvasHeight * 0.6,
     width: canvasWidth * 0.6,
-  }
+  };
 
   const leftArmController = new ArmController({
     arm: leftArm,
@@ -72,8 +71,8 @@ export default function run(canvas, assetsPath) {
     mouseAreaDimens: mouseAreaDimens,
     // These two formulae define how much horizontal and vertical force is
     // applied to the arm as a function of mouse position
-    yForceFormula: y => signedPow(y, 2) * 0.12,
-    xForceFormula: x => x * -0.2,
+    yForceFormula: (y) => signedPow(y, 2) * 0.12,
+    xForceFormula: (x) => x * -0.2,
   });
 
   const rightArmController = new ArmController({
@@ -81,8 +80,8 @@ export default function run(canvas, assetsPath) {
     engine: engine,
     canvas: render.canvas,
     mouseAreaDimens: mouseAreaDimens,
-    yForceFormula: y => signedPow(y, 2) * -0.04,
-    xForceFormula: x => x * 0.1,
+    yForceFormula: (y) => signedPow(y, 2) * -0.04,
+    xForceFormula: (x) => x * 0.1,
   });
 
   // We expect our canvas to be in a flex div that handles horizontally
@@ -93,7 +92,7 @@ export default function run(canvas, assetsPath) {
     leftArmController.canvasDimensChanged(render.canvas, mouseAreaDimens);
     rightArmController.canvasDimensChanged(render.canvas, mouseAreaDimens);
   };
-  window.addEventListener('resize', resizeListener);
+  window.addEventListener("resize", resizeListener);
 
   World.add(engine.world, leftArm.getComposite());
   World.add(engine.world, rightArm.getComposite());
@@ -105,18 +104,16 @@ export default function run(canvas, assetsPath) {
 
   bumpListener.subscribe((bumpEvent) => {
     if (bumpEvent.type == BUMP_TYPE.TOP) {
-      console.log('top!');
-    }
-    else if (bumpEvent.type == BUMP_TYPE.FRONT) {
-      console.log('front!');
-    }
-    else if (bumpEvent.type == BUMP_TYPE.BOTTOM) {
-      console.log('bottom!');
+      console.log("top!");
+    } else if (bumpEvent.type == BUMP_TYPE.FRONT) {
+      console.log("front!");
+    } else if (bumpEvent.type == BUMP_TYPE.BOTTOM) {
+      console.log("bottom!");
     }
   });
 
   return () => {
-    window.removeEventListener('resize', resizeListener);
+    window.removeEventListener("resize", resizeListener);
 
     bumpListener.destroy();
     leftArmController.destroy();
@@ -126,5 +123,5 @@ export default function run(canvas, assetsPath) {
     World.clear(engine.world, leftArm.getComposite());
     World.clear(engine.world, rightArm.getComposite());
     Engine.clear(engine);
-  }
+  };
 }

@@ -1,4 +1,4 @@
-import Matter from 'matter-js';
+import Matter from "matter-js";
 
 const Events = Matter.Events;
 
@@ -29,12 +29,12 @@ export default class ArmController {
 
     // Initialise controller when mouse enters the canvas, avoids hands jolting towards the mouse
     // when the page loads
-    canvas.addEventListener('mouseenter', () => {
+    canvas.addEventListener("mouseenter", () => {
       this.canvasDimensChanged(canvas, mouseAreaDimens);
-      window.addEventListener('mousemove', this._boundUpdateArmForces, false);
+      window.addEventListener("mousemove", this._boundUpdateArmForces, false);
     });
 
-    Events.on(this.engine, 'beforeUpdate', this._boundApplyArmForces)
+    Events.on(this.engine, "beforeUpdate", this._boundApplyArmForces);
   }
 
   updateArmForces({ x, y }) {
@@ -57,16 +57,18 @@ export default class ArmController {
   }
 
   destroy() {
-    window.removeEventListener('mousemove', this._boundUpdateArmForces, false);
-    Events.off(this.engine, 'beforeUpdate', this._boundApplyArmForces)
+    window.removeEventListener("mousemove", this._boundUpdateArmForces, false);
+    Events.off(this.engine, "beforeUpdate", this._boundApplyArmForces);
   }
 }
 
 function getMouseAreaBounds(canvas, mouseAreaDimens) {
   const canvasBoundingRect = canvas.getBoundingClientRect();
 
-  const mouseAreaWidthOffset = (canvasBoundingRect.width - mouseAreaDimens.width) * 0.5;
-  const mouseAreaHeightOffset = (canvasBoundingRect.height - mouseAreaDimens.height) * 0.5;
+  const mouseAreaWidthOffset =
+    (canvasBoundingRect.width - mouseAreaDimens.width) * 0.5;
+  const mouseAreaHeightOffset =
+    (canvasBoundingRect.height - mouseAreaDimens.height) * 0.5;
 
   return {
     left: canvasBoundingRect.left + mouseAreaWidthOffset,
@@ -86,8 +88,8 @@ function getRelativeUnitVec(vec, area) {
   const areaWidth = area.right - area.left;
   const areaHeight = area.bottom - area.top;
 
-  const areaOriginX = area.left + (areaWidth * 0.5);
-  const areaOriginY = area.top + (areaHeight * 0.5);
+  const areaOriginX = area.left + areaWidth * 0.5;
+  const areaOriginY = area.top + areaHeight * 0.5;
 
   const vecRelativeX = vec.x - areaOriginX;
   const vecRelativeY = vec.y - areaOriginY;
@@ -101,16 +103,14 @@ function getRelativeUnitVec(vec, area) {
 // Limit the provided vector's X and/or Y component to the given maximum value
 function limitVec(vec, max) {
   if (vec.x > max) {
-    vec.x = max
-  }
-  else if (vec.x < -max) {
+    vec.x = max;
+  } else if (vec.x < -max) {
     vec.x = -max;
   }
 
   if (vec.y > max) {
-    vec.y = max
-  }
-  else if (vec.y < -max) {
+    vec.y = max;
+  } else if (vec.y < -max) {
     vec.y = -max;
   }
 
