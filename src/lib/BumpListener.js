@@ -13,9 +13,9 @@ import {
 
 const Events = Matter.Events;
 
-const TOP_BOTTOM_VEL_THRESHOLD = 0.2;
-const FRONT_VEL_THRESHOLD = 2;
-const DEBOUNCE_TIME = 100;
+const TOP_BOTTOM_VEL_THRESHOLD = 2;
+const FRONT_VEL_THRESHOLD = 5;
+const DEBOUNCE_TIME = 200;
 
 export const BUMP_TYPE = {
   TOP: "TOP",
@@ -34,10 +34,17 @@ export default class BumpListener {
         return;
       }
 
-      const bodyA = event.pairs[0].bodyA;
-      const bodyB = event.pairs[0].bodyB;
-
       let leftBody, rightBody;
+
+      const sensorPair = event.pairs.find(
+        (pair) => pair.bodyA.isSensor && pair.bodyB.isSensor
+      );
+
+      if (!sensorPair) {
+        return;
+      }
+
+      const { bodyA, bodyB } = sensorPair;
 
       if (
         bodyA.label.startsWith(LH_PREFIX) &&
