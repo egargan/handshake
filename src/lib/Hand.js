@@ -60,7 +60,7 @@ export default class Hand {
     const contactLengthSf = 0.75;
     const sideContactLength = length * contactLengthSf;
     const frontContactLength = width * contactLengthSf;
-    const contactWidth = 10;
+    const contactWidth = 25;
 
     const contactCollisionGroup = Body.nextGroup(true);
 
@@ -93,6 +93,7 @@ export default class Hand {
           mask: TOP_COLLISION_MASK,
         },
         render: contactRenderOptions,
+        isSensor: true,
       }
     );
 
@@ -109,6 +110,7 @@ export default class Hand {
           mask: FRONT_COLLISION_MASK,
         },
         render: contactRenderOptions,
+        isSensor: true,
       }
     );
 
@@ -125,6 +127,7 @@ export default class Hand {
           mask: BOTTOM_COLLISION_MASK,
         },
         render: contactRenderOptions,
+        isSensor: true,
       }
     );
 

@@ -13,9 +13,9 @@ import {
 
 const Events = Matter.Events;
 
-const TOP_BOTTOM_VEL_THRESHOLD = 1;
-const FRONT_VEL_THRESHOLD = 3;
-const DEBOUNCE_TIME = 200;
+const TOP_BOTTOM_VEL_THRESHOLD = 0.2;
+const FRONT_VEL_THRESHOLD = 2;
+const DEBOUNCE_TIME = 100;
 
 export const BUMP_TYPE = {
   TOP: "TOP",
@@ -65,6 +65,7 @@ export default class BumpListener {
         this.ignoreEvent = true;
 
         clearTimeout(this.debounceTimeout);
+
         this.debounceTimeout = setTimeout(
           () => (this.ignoreEvent = false),
           DEBOUNCE_TIME
