@@ -1,4 +1,4 @@
-import run from "../index.js";
+import run from "../lib/index.js";
 
 const container = document.querySelector("[data-handshake-container]");
 
@@ -8,4 +8,16 @@ if (!container) {
   );
 }
 
-run(container, "assets");
+const [controller] = run(container, "assets");
+
+controller.setPassword(["TOP", "TOP", "BOTTOM"]);
+
+document.onkeydown = (event) => {
+  if (event.key === "Enter") {
+    if (controller.confirm()) {
+      window.alert("Correct!");
+    }
+  } else if (event.key === "Backspace") {
+    controller.reset();
+  }
+};

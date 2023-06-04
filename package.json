@@ -1,16 +1,10 @@
 {
   "name": "handshake",
   "version": "2.1.0",
-  "exports": "./src/index.js",
+  "exports": "./src/lib/index.js",
   "files": [
-    "src/Arm.js",
-    "src/Arm.js",
-    "src/ArmController.js",
-    "src/BumpListener.js",
-    "src/Hand.js",
-    "src/Utils.js",
-    "src/index.js",
-    "assets"
+    "assets",
+    "src/lib/*"
   ],
   "type": "module",
   "scripts": {

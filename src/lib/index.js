@@ -2,13 +2,18 @@ import Matter from "matter-js";
 import Arm from "./Arm.js";
 import ArmController from "./ArmController.js";
 import { signedPow } from "./Utils.js";
-import BumpListener, { BUMP_TYPE } from "./BumpListener.js";
+import BumpListener from "./BumpListener.js";
+import PasswordRecorder from "./PasswordRecorder.js";
+import PasswordDisplayer from "./PasswordDisplayer.js";
+import HandshakeController from "./HandshakeController.js";
 
 const { Engine, Render, World } = Matter;
 
 /**
  * @param {HTMLElement} container
  * @param {string} assetsPath
+ * @returns {[typeof HandshakeController, () => {}]} a tuple containing the controller used to
+ * interact with the handshake system, and a cleanup function
  */
 export default function run(container, assetsPath) {
   const canvas = document.createElement("canvas");
@@ -110,18 +115,18 @@ export default function run(container, assetsPath) {
   // })
 
   const bumpListener = new BumpListener(engine);
+  const passwordRecorder = new PasswordRecorder();
+
+  const passwordDisplay = new PasswordDisplayer(passwordRecorder, assetsPath);
+  container.appendChild(passwordDisplay.getDisplayContainer());
 
   bumpListener.subscribe((bumpEvent) => {
-    if (bumpEvent.type == BUMP_TYPE.TOP) {
-      console.log("top!");
-    } else if (bumpEvent.type == BUMP_TYPE.FRONT) {
-      console.log("front!");
-    } else if (bumpEvent.type == BUMP_TYPE.BOTTOM) {
-      console.log("bottom!");
-    }
+    passwordRecorder.addToken(bumpEvent.type);
   });
 
-  return () => {
+  const handshakeController = new HandshakeController(passwordRecorder);
+
+  const cleanup = () => {
     window.removeEventListener("resize", resizeListener);
 
     bumpListener.destroy();
@@ -133,4 +138,6 @@ export default function run(container, assetsPath) {
     World.clear(engine.world, rightArm.getComposite());
     Engine.clear(engine);
   };
+
+  return [handshakeController, cleanup];
 }
