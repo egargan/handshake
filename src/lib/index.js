@@ -4,10 +4,9 @@ import ArmController from "./ArmController.js";
 import { signedPow } from "./Utils.js";
 import BumpListener from "./BumpListener.js";
 import PasswordRecorder from "./PasswordRecorder.js";
-import PasswordDisplayer from "./PasswordDisplayer.js";
 import HandshakeController from "./HandshakeController.js";
 
-const { Engine, Render, World, Events, Runner, Common } = Matter;
+const { Engine, Render, World, Runner } = Matter;
 
 /**
  * @param {HTMLElement} container
@@ -119,9 +118,6 @@ export default function run(container, assetsPath, debug = false) {
 
   const bumpListener = new BumpListener(engine);
   const passwordRecorder = new PasswordRecorder();
-
-  const passwordDisplay = new PasswordDisplayer(passwordRecorder, assetsPath);
-  container.appendChild(passwordDisplay.getDisplayContainer());
 
   bumpListener.subscribe((bumpEvent) => {
     passwordRecorder.addToken(bumpEvent.type);

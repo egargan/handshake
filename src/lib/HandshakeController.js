@@ -18,6 +18,14 @@ export default class HandshakeController {
     this.passwordRecorder.resetPassword();
   }
 
+  /**
+   * @type {((newPassword: Token[], newToken: Token) => {})[]}
+   * @returns {() => {}}
+   */
+  onPasswordChanged(callback) {
+    return this.passwordRecorder.addListener(callback);
+  }
+
   confirm() {
     if (!this.controlPassword) {
       throw new Error(

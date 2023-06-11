@@ -4,7 +4,7 @@ export default class PasswordRecorder {
   /** @type {Token[]} */
   currentPassword;
 
-  /** @type {((newPassword: Token[]) => {})[]} */
+  /** @type {((newPassword: Token[], newToken: Token) => {})[]} */
   listeners = [];
 
   constructor() {
@@ -14,7 +14,7 @@ export default class PasswordRecorder {
   /** @param {Token} token */
   addToken(token) {
     this.currentPassword.push(token);
-    this._callListeners(this.currentPassword);
+    this._callListeners(this.currentPassword, token);
   }
 
   resetPassword() {
@@ -31,7 +31,7 @@ export default class PasswordRecorder {
     };
   }
 
-  _callListeners(password) {
-    this.listeners.forEach((listener) => listener(password));
+  _callListeners(password, token) {
+    this.listeners.forEach((listener) => listener(password, token));
   }
 }
