@@ -14,7 +14,7 @@ import {
 const Events = Matter.Events;
 
 const TOP_BOTTOM_VEL_THRESHOLD = 2;
-const FRONT_VEL_THRESHOLD = 5;
+const FRONT_VEL_THRESHOLD = 4;
 const DEBOUNCE_TIME = 200;
 
 export const BUMP_TYPE = {

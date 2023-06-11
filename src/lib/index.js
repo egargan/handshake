@@ -7,7 +7,7 @@ import PasswordRecorder from "./PasswordRecorder.js";
 import PasswordDisplayer from "./PasswordDisplayer.js";
 import HandshakeController from "./HandshakeController.js";
 
-const { Engine, Render, World } = Matter;
+const { Engine, Render, World, Events, Runner, Common } = Matter;
 
 /**
  * @param {HTMLElement} container
@@ -110,13 +110,12 @@ export default function run(container, assetsPath, debug = false) {
   World.add(engine.world, leftArm.getComposite());
   World.add(engine.world, rightArm.getComposite());
 
-  Engine.run(engine);
   Render.run(render);
 
-  // TODO: use this to cap framerate?
-  // Events.on(runner, 'tick',() => {
-  //   runner.deltaMin = runner.fps > 60 ? 1000 / runner.fps : 1000 / 60;
-  // })
+  // Use a fixed delta slightly beneath the default (16.6*) to avoid the arms moving too
+  // quickly on high refresh rate screens
+  const runner = Runner.create({ isFixed: true, delta: 12 });
+  Runner.run(runner, engine);
 
   const bumpListener = new BumpListener(engine);
   const passwordRecorder = new PasswordRecorder();
