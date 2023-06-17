@@ -47,13 +47,15 @@ export default class Hand {
   constructor({
     posX = 0,
     posY = 0,
-    debug = false,
     width,
     length,
     isLeftHand,
     bodyOptions,
     assetsPath,
   }) {
+    this.isLeftHand = isLeftHand;
+    this.assetsPath = assetsPath;
+
     const halfLength = length * 0.5;
     const halfWidth = width * 0.5;
 
@@ -65,8 +67,9 @@ export default class Hand {
     const contactCollisionGroup = Body.nextGroup(true);
 
     const contactRenderOptions = {
+      // Don't render initially, but prepare 'debug' render options
       ...debugBodyRender,
-      visible: debug,
+      visible: false,
     };
 
     const hand = Bodies.rectangle(posX, posY, length, width, {
@@ -77,7 +80,7 @@ export default class Hand {
         group: contactCollisionGroup,
         mask: HAND_COLLISION_MASK,
       },
-      render: getHandRenderOptions(debug, isLeftHand, assetsPath),
+      render: getHandRenderOptions(false, isLeftHand, assetsPath),
     });
 
     const topContact = Bodies.rectangle(
@@ -135,8 +138,9 @@ export default class Hand {
       bodyA: hand,
       stiffness: 0.5,
       render: {
+        // Don't render initially, but prepare 'debug' render options
         strokeStyle: "#aaa",
-        visible: debug,
+        visible: false,
       },
     };
 
@@ -208,22 +212,46 @@ export default class Hand {
   getComposite() {
     return this.composite;
   }
+
+  setDebugView(debug) {
+    this.composite.constraints.forEach((constraint) => {
+      constraint.render.visible = debug;
+    });
+
+    this.composite.bodies.forEach((body) => {
+      if (body.label !== LH_BODY && body.label !== RH_BODY) {
+        body.render.visible = debug;
+      }
+    });
+
+    this.body.render = {
+      ...getHandRenderOptions(debug, this.isLeftHand, this.assetsPath, false),
+    };
+  }
 }
 
-function getHandRenderOptions(debug, isLeftHand, assetsPath) {
+function getHandRenderOptions(
+  debug,
+  isLeftHand,
+  assetsPath,
+  isInitialRender = true
+) {
   if (debug) {
     return {
       ...debugBodyRender,
+      visible: true,
     };
   } else {
     return {
+      visible: true,
       sprite: {
         texture: isLeftHand
           ? `${assetsPath}/left_hand.png`
           : `${assetsPath}/right_hand.png`,
-        yOffset: 0.04,
+        yOffset: isInitialRender ? 0.04 : 0.54,
         xScale: 0.3,
         yScale: 0.3,
+        xOffset: isInitialRender ? 0 : 0.5,
       },
     };
   }

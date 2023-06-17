@@ -8,9 +8,23 @@ export default class HandshakeController {
   /** @type {('TOP'|'BOTTOM'|'FRONT')[]} */
   controlPassword;
 
-  constructor(passwordRecorder, bumpListener) {
+  /** @type {import("./ArmController").default} */
+  leftArm;
+
+  /** @type {import("./ArmController").default} */
+  rightArm;
+
+  /** @type {import("matter-js").Render} */
+  render;
+
+  constructor(passwordRecorder, bumpListener, leftArm, rightArm, render) {
     this.passwordRecorder = passwordRecorder;
     this.bumpListener = bumpListener;
+    this.leftArm = leftArm;
+    this.rightArm = rightArm;
+    this.render = render;
+
+    this.debug = false;
   }
 
   /** @param {('TOP'|'BOTTOM'|'FRONT')[]} password */
@@ -61,5 +75,16 @@ export default class HandshakeController {
 
   resumeInput() {
     this.bumpListener.resume();
+  }
+
+  toggleDebugView() {
+    this.setDebugView(!this.debug);
+  }
+
+  setDebugView(debug) {
+    this.debug = debug;
+    this.leftArm.setDebugView(debug);
+    this.rightArm.setDebugView(debug);
+    this.render.options.showCollisions = debug;
   }
 }

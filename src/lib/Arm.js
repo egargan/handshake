@@ -2,6 +2,9 @@ import Matter from "matter-js";
 import { translateCompositeWithConstraints } from "./Utils.js";
 import Hand from "./Hand.js";
 
+export const LA_BODY = "LA_BODY";
+export const RA_BODY = "RA_BODY";
+
 const Body = Matter.Body,
   Composite = Matter.Composite,
   Constraint = Matter.Constraint,
@@ -24,9 +27,11 @@ export default class Arm {
     length = 240,
     width = 60,
     isLeftHand = true,
-    debug = false,
     assetsPath,
   }) {
+    this.isLeftHand = isLeftHand;
+    this.assetsPath = assetsPath;
+
     const collisionGroup = Body.nextGroup(true);
 
     const nonCollidingFilter = {
@@ -46,8 +51,9 @@ export default class Arm {
     const arm = Composite.create();
 
     const bodyRenderOptions = {
+      // Don't render initially, but prepare 'debug' render options
       ...debugBodyRender,
-      visible: debug,
+      visible: false,
     };
 
     // Elbow is a *static* body, meaning it's essentially fixed in space
@@ -63,7 +69,8 @@ export default class Arm {
       forearmWidth,
       {
         collisionFilter: nonCollidingFilter,
-        render: getArmRenderOptions(debug, isLeftHand, assetsPath),
+        render: getArmRenderOptions(false, isLeftHand, assetsPath),
+        label: isLeftHand ? LA_BODY : RA_BODY,
       }
     );
 
@@ -72,7 +79,6 @@ export default class Arm {
       width: handWidth,
       length: handLength,
       isLeftHand: isLeftHand,
-      debug,
       assetsPath,
     });
 
@@ -82,9 +88,10 @@ export default class Arm {
     Composite.add(arm, [elbowBody, forearmBody, handComposite]);
 
     const commonConstraintArgs = {
+      // Don't render initially, but prepare 'debug' render options
       render: {
         strokeStyle: "#aaa",
-        visible: debug,
+        visible: false,
       },
     };
 
@@ -230,20 +237,52 @@ export default class Arm {
   getHandController() {
     return this.handController;
   }
+
+  setDebugView(debug) {
+    this.composite.constraints.forEach((constraint) => {
+      constraint.render.visible = debug;
+    });
+
+    this.composite.bodies.forEach((body) => {
+      if (body.label !== LA_BODY && body.label !== RA_BODY) {
+        body.render.visible = debug;
+      }
+    });
+
+    this.forearmBody.render = {
+      ...getArmRenderOptions(debug, this.isLeftHand, this.assetsPath, false),
+    };
+
+    this.hand.setDebugView(debug);
+  }
 }
 
-function getArmRenderOptions(debug, isLeftHand, assetsPath) {
+function getArmRenderOptions(
+  debug,
+  isLeftHand,
+  assetsPath,
+  isInitialRender = true
+) {
   if (debug) {
     return {
       ...debugBodyRender,
+      visible: true,
     };
   } else {
+    let xOffset = isLeftHand ? 0.07 : -0.07;
+
+    if (!isInitialRender) {
+      xOffset += 0.5;
+    }
+
     return {
+      visible: true,
       sprite: {
         texture: isLeftHand
           ? `${assetsPath}/left_arm.png`
           : `${assetsPath}/right_arm.png`,
-        xOffset: isLeftHand ? 0.07 : -0.07,
+        xOffset,
+        yOffset: isInitialRender ? 0 : 0.5,
         xScale: 0.24,
         yScale: 0.24,
       },
