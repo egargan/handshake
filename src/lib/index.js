@@ -123,7 +123,7 @@ export default function run(container, assetsPath, debug = false) {
     passwordRecorder.addToken(bumpEvent.type);
   });
 
-  const handshakeController = new HandshakeController(passwordRecorder);
+  const handshakeController = new HandshakeController(passwordRecorder, bumpListener);
 
   const cleanup = () => {
     window.removeEventListener("resize", resizeListener);

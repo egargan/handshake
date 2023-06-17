@@ -2,11 +2,15 @@ export default class HandshakeController {
   /** @type {import("./PasswordRecorder").default} */
   passwordRecorder;
 
+  /** @type {import("./BumpListener").default} */
+  bumpListener;
+
   /** @type {('TOP'|'BOTTOM'|'FRONT')[]} */
   controlPassword;
 
-  constructor(passwordRecorder) {
+  constructor(passwordRecorder, bumpListener) {
     this.passwordRecorder = passwordRecorder;
+    this.bumpListener = bumpListener;
   }
 
   /** @param {('TOP'|'BOTTOM'|'FRONT')[]} password */
@@ -49,5 +53,13 @@ export default class HandshakeController {
     }
 
     return true;
+  }
+
+  pauseInput() {
+    this.bumpListener.pause();
+  }
+
+  resumeInput() {
+    this.bumpListener.resume();
   }
 }

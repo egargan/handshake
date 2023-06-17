@@ -28,8 +28,13 @@ export default class BumpListener {
     this.subscriptions = [];
     this.engine = engine;
     this.ignoreEvent = false;
+    this.paused = false;
 
     Events.on(engine, "collisionStart", (event) => {
+      if (this.paused) {
+        return;
+      }
+
       if (this.ignoreEvent) {
         return;
       }
@@ -83,6 +88,14 @@ export default class BumpListener {
 
   subscribe(callback) {
     this.subscriptions.push(callback);
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  resume() {
+    this.paused = false;
   }
 
   destroy() {
