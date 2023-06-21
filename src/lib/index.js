@@ -5,6 +5,7 @@ import { signedPow } from "./Utils.js";
 import BumpListener from "./BumpListener.js";
 import PasswordRecorder from "./PasswordRecorder.js";
 import HandshakeController from "./HandshakeController.js";
+import StableRunner from "./StableRunner.js";
 
 const { Engine, Render, World, Runner } = Matter;
 
@@ -111,10 +112,8 @@ export default function run(container, assetsPath, debug = false) {
 
   Render.run(render);
 
-  // Use a fixed delta slightly beneath the default (16.6*) to avoid the arms moving too
-  // quickly on high refresh rate screens
-  const runner = Runner.create({ isFixed: true, delta: 12 });
-  Runner.run(runner, engine);
+  const runner = new StableRunner(engine);
+  runner.run();
 
   const bumpListener = new BumpListener(engine);
   const passwordRecorder = new PasswordRecorder();
@@ -137,6 +136,8 @@ export default function run(container, assetsPath, debug = false) {
     bumpListener.destroy();
     leftArmController.destroy();
     rightArmController.destroy();
+
+    runner.stop();
 
     Render.stop(render);
     World.clear(engine.world, leftArm.getComposite());
