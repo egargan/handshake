@@ -34,7 +34,7 @@ export default function run(container, assetsPath, debug = false) {
     engine: engine,
     options: {
       wireframes: false,
-      background: "#fff",
+      background: "transparent",
       height: canvasHeight,
       width: canvasWidth,
       showCollisions: debug,
@@ -127,7 +127,7 @@ export default function run(container, assetsPath, debug = false) {
     bumpListener,
     leftArm,
     rightArm,
-    render
+    render,
   );
 
   const cleanup = () => {
