@@ -1,6 +1,6 @@
 {
   "name": "handshake",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "exports": "./src/lib/index.js",
   "files": [
     "assets",
